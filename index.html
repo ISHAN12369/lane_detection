@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lane Detection</title>
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #ec4899;
+      --accent: #22c55e;
+      --accent-dark: #16a34a;
+      --text: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --muted: #94a3b8;
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --border: rgba(148, 163, 184, 0.12);
+      --border-strong: rgba(148, 163, 184, 0.24);
+      --shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 40px 80px rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 30%, #2d1b4e 60%, #1e1b2e 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 40% 0%, rgba(34, 197, 94, 0.05) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      width: min(1200px, 100%);
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      overflow: hidden;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      padding: 48px 48px 32px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(236, 72, 153, 0.03) 100%);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.1));
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      color: #e0e7ff;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 18px;
+      backdrop-filter: blur(12px);
+    }
+
+    .eyebrow::before {
+      content: "🛣️";
+      font-size: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.1;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 50%, #86efac 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      margin: 16px 0 0;
+      max-width: 700px;
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.8;
+      font-weight: 400;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      padding: 28px 48px 12px;
+    }
+
+    .upload-label,
+    .run-button {
+      border: 0;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: capitalize;
+      letter-spacing: 0.3px;
+    }
+
+    .upload-label {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.08));
+      color: var(--text);
+      padding: 12px 24px;
+      border: 1.5px solid rgba(99, 102, 241, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .upload-label::before {
+      content: "📁";
+      font-size: 16px;
+    }
+
+    .run-button {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: #ffffff;
+      padding: 12px 36px;
+      min-width: 180px;
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+    }
+
+    .upload-label:hover {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(236, 72, 153, 0.12));
+      border-color: rgba(99, 102, 241, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .run-button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(99, 102, 241, 0.4);
+    }
+
+    .run-button:active:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .run-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    #file-input {
+      display: none;
+    }
+
+    .filename {
+      color: var(--muted);
+      font-size: 0.95rem;
+      padding-left: 8px;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .status {
+      min-height: 28px;
+      padding: 0 48px 24px;
+      color: var(--muted);
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status::before {
+      content: "ℹ️";
+      font-size: 16px;
+    }
+
+    .status.loading {
+      color: #7dd3fc;
+    }
+
+    .status.loading::before {
+      content: "⏳";
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .status.error {
+      color: #fb7185;
+    }
+
+    .status.error::before {
+      content: "❌";
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      padding: 0 48px 48px;
+    }
+
+    .panel {
+      min-height: 400px;
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.4), rgba(51, 65, 85, 0.2));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, currentColor, transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .panel:nth-child(1)::before {
+      background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+    }
+
+    .panel:nth-child(2)::before {
+      background: linear-gradient(90deg, transparent, #eab308, transparent);
+    }
+
+    .panel:nth-child(3)::before {
+      background: linear-gradient(90deg, transparent, #22c55e, transparent);
+    }
+
+    .panel:hover {
+      border-color: var(--border-strong);
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.6), rgba(51, 65, 85, 0.3));
+      transform: translateY(-4px);
+      box-shadow: 0 16px 32px rgba(99, 102, 241, 0.1);
+    }
+
+    .panel:hover::before {
+      opacity: 1;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel:nth-child(1) .panel-title::before { content: "📸"; }
+    .panel:nth-child(2) .panel-title::before { content: "🎯"; }
+    .panel:nth-child(3) .panel-title::before { content: "🌈"; }
+
+    .image-frame {
+      position: relative;
+      flex: 1;
+      min-height: 300px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px dashed var(--border-strong);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.4));
+      display: grid;
+      place-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .image-frame:hover {
+      border-color: var(--primary);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.5));
+    }
+
+    .image-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+      background: #020617;
+    }
+
+    .image-frame img.visible {
+      display: block;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .placeholder {
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .spinner {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 4px solid rgba(99, 102, 241, 0.1);
+      border-top-color: var(--primary);
+      border-right-color: var(--secondary);
+      animation: spin 1s linear infinite;
+      display: none;
+    }
+
+    .spinner.visible {
+      display: block;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 32px 24px 24px;
+      }
+
+      .controls {
+        padding: 20px 24px 8px;
+        gap: 12px;
+      }
+
+      .preview-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 0 24px 32px;
+      }
+
+      .status {
+        padding: 0 24px 16px;
+      }
+
+      .panel {
+        min-height: 320px;
+        padding: 20px;
+      }
+
+      .run-button,
+      .upload-label {
+        flex: 1;
+      }
+
+      .filename {
+        display: none;
+      }
+
+      h1 {
+        font-size: clamp(1.8rem, 5vw, 2.5rem);
+      }
+
+      .eyebrow::before {
+        display: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header {
+        padding: 24px 16px 20px;
+      }
+
+      .controls {
+        padding: 16px;
+        gap: 10px;
+      }
+
+      .preview-grid {
+        padding: 0 16px 24px;
+      }
+
+      .status {
+        padding: 0 16px 16px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="header">
+      <span class="eyebrow">Flask + PyTorch</span>
+      <h1>Lane Detection Studio</h1>
+      <p class="subtitle">
+        Upload a road image, run the existing LaneNet inference pipeline, and compare the original frame with both the binary mask and instance segmentation result.
+      </p>
+    </section>
+
+    <form id="upload-form">
+      <section class="controls">
+        <label for="file-input" class="upload-label">Choose Image</label>
+        <input id="file-input" name="image" type="file" accept="image/*">
+        <button type="submit" class="run-button" id="run-button">Run Detection</button>
+        <span class="filename" id="filename">No file selected</span>
+      </section>
+    </form>
+
+    <div class="status" id="status">Select an image to begin.</div>
+
+    <section class="preview-grid">
+      <article class="panel">
+        <h2 class="panel-title">Uploaded Image</h2>
+        <div class="image-frame">
+          <img id="input-preview" alt="Uploaded preview">
+          <div class="placeholder" id="input-placeholder">Your selected image will appear here.</div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2 class="panel-title">Binary Segmentation</h2>
+        <div class="image-frame">
+          <img id="binary-preview" alt="Binary segmentation result">
+          <div class="spinner" id="spinner"></div>
+          <div class="placeholder" id="binary-placeholder">The generated binary lane mask will appear here.</div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <h2 class="panel-title">Instance Segmentation</h2>
+        <div class="image-frame">
+          <img id="instance-preview" alt="Instance segmentation result">
+          <div class="placeholder" id="instance-placeholder">The generated instance segmentation output will appear here.</div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const form = document.getElementById("upload-form");
+    const fileInput = document.getElementById("file-input");
+    const fileName = document.getElementById("filename");
+    const status = document.getElementById("status");
+    const runButton = document.getElementById("run-button");
+    const inputPreview = document.getElementById("input-preview");
+    const binaryPreview = document.getElementById("binary-preview");
+    const instancePreview = document.getElementById("instance-preview");
+    const inputPlaceholder = document.getElementById("input-placeholder");
+    const binaryPlaceholder = document.getElementById("binary-placeholder");
+    const instancePlaceholder = document.getElementById("instance-placeholder");
+    const spinner = document.getElementById("spinner");
+    let inputUrl = null;
+    let instanceUrl = null;
+
+    function setStatus(message, state) {
+      status.textContent = message;
+      status.className = "status";
+      if (state) {
+        status.classList.add(state);
+      }
+    }
+
+    function revokePreviewUrl(url) {
+      if (url && url.startsWith("blob:")) {
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    fileInput.addEventListener("change", () => {
+      const [file] = fileInput.files;
+      if (!file) {
+        fileName.textContent = "No file selected";
+        inputPreview.classList.remove("visible");
+        inputPreview.removeAttribute("src");
+        inputPlaceholder.style.display = "block";
+        revokePreviewUrl(inputUrl);
+        inputUrl = null;
+        return;
+      }
+
+      fileName.textContent = file.name;
+      revokePreviewUrl(inputUrl);
+      inputUrl = URL.createObjectURL(file);
+      inputPreview.src = inputUrl;
+      inputPreview.classList.add("visible");
+      inputPlaceholder.style.display = "none";
+
+      binaryPreview.classList.remove("visible");
+      binaryPreview.removeAttribute("src");
+      binaryPlaceholder.style.display = "block";
+      instancePreview.classList.remove("visible");
+      instancePreview.removeAttribute("src");
+      instancePlaceholder.style.display = "block";
+      spinner.classList.remove("visible");
+      setStatus("Image ready. Click Run Detection to process it.", "");
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const [file] = fileInput.files;
+      if (!file) {
+        setStatus("Please choose an image before running detection.", "error");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      runButton.disabled = true;
+      spinner.classList.add("visible");
+      binaryPlaceholder.style.display = "none";
+      instancePlaceholder.style.display = "none";
+      binaryPreview.classList.remove("visible");
+      binaryPreview.removeAttribute("src");
+      instancePreview.classList.remove("visible");
+      instancePreview.removeAttribute("src");
+      revokePreviewUrl(instanceUrl);
+      instanceUrl = null;
+      setStatus("Running lane detection. This can take a few seconds.", "loading");
+
+      try {
+        const response = await fetch("/predict", {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          let errorMessage = "Prediction failed.";
+          const responseText = await response.text();
+          try {
+            const errorData = JSON.parse(responseText);
+            if (errorData.error) {
+              errorMessage = errorData.error;
+            }
+          } catch (error) {
+            if (responseText.trim()) {
+              errorMessage = responseText.trim();
+            }
+          }
+          throw new Error(errorMessage);
+        }
+
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+          const data = await response.json();
+          binaryPreview.src = `data:image/jpeg;base64,${data.binary_image}`;
+          instancePreview.src = `data:image/jpeg;base64,${data.instance_image}`;
+          binaryPreview.classList.add("visible");
+          instancePreview.classList.add("visible");
+          setStatus("Lane detection complete.", "");
+        } else if (contentType.startsWith("image/")) {
+          const blob = await response.blob();
+          instanceUrl = URL.createObjectURL(blob);
+          instancePreview.src = instanceUrl;
+          instancePreview.classList.add("visible");
+          binaryPlaceholder.textContent = "Binary output is unavailable from the current backend response. Restart the Flask app to load the updated route.";
+          binaryPlaceholder.style.display = "block";
+          setStatus("Instance output loaded. Restart the Flask app to enable binary output too.", "loading");
+        } else {
+          throw new Error("Unexpected response format from /predict.");
+        }
+      } catch (error) {
+        binaryPlaceholder.style.display = "block";
+        instancePlaceholder.style.display = "block";
+        setStatus(error.message || "Prediction failed.", "error");
+      } finally {
+        spinner.classList.remove("visible");
+        runButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
