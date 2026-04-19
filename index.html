@@ -604,6 +604,87 @@
                 background: var(--dm-red);
             }
 
+            .tab-pane {
+                display: none;
+                animation: fadeIn 0.5s ease;
+            }
+            .tab-pane.active {
+                display: block;
+            }
+
+            /* Methodology Content Styling */
+            .tc-content h3 {
+                font-family: var(--font-brand);
+                font-size: 32px;
+                margin: 40px 0 16px;
+                text-transform: uppercase;
+                color: var(--dm-black);
+            }
+            .tc-content p {
+                margin-bottom: 20px;
+            }
+            .tc-content ul {
+                list-style: none;
+                margin-bottom: 32px;
+            }
+            .tc-content li {
+                position: relative;
+                padding-left: 24px;
+                margin-bottom: 12px;
+                font-family: var(--font-body);
+                font-size: 16px;
+                font-weight: 300;
+                color: var(--dm-gray);
+            }
+            .tc-content li::before {
+                content: "—";
+                position: absolute;
+                left: 0;
+                color: var(--dm-red);
+            }
+            .tc-content code {
+                font-family: var(--font-mono);
+                font-size: 14px;
+                background: rgba(196, 16, 40, 0.08);
+                padding: 2px 6px;
+                border-radius: 4px;
+                color: var(--dm-red);
+            }
+            .tc-content table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 24px 0 40px;
+                background: rgba(255, 255, 255, 0.4);
+                border-radius: var(--radius-sm);
+                overflow: hidden;
+            }
+            .tc-content th {
+                background: var(--dm-bone);
+                padding: 12px 16px;
+                text-align: left;
+                font-family: var(--font-brand);
+                font-size: 14px;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+            }
+            .tc-content td {
+                padding: 12px 16px;
+                border-bottom: 1px solid var(--dm-border);
+                font-family: var(--font-body);
+                font-size: 14px;
+            }
+            .tc-content pre {
+                background: var(--dm-black);
+                color: #fff;
+                padding: 24px;
+                border-radius: var(--radius-md);
+                font-family: var(--font-mono);
+                font-size: 13px;
+                line-height: 1.6;
+                overflow-x: auto;
+                margin: 20px 0 32px;
+            }
+
             .tp-body {
                 flex: 1;
                 overflow-y: auto;
@@ -1104,7 +1185,6 @@
             "
         >
             <a href="#" class="nav-link">Studio</a>
-            <a href="#" class="nav-link">Project</a>
             <button class="btn-theory-trigger" id="openTheory">
                 Methodology
             </button>
@@ -1525,7 +1605,7 @@
 
             <div class="tp-tabs" id="tabsRow">
                 <button class="tab-btn active" data-tab="overview">
-                    Context
+                    Overview
                 </button>
                 <button class="tab-btn" data-tab="architecture">
                     Structure
@@ -1533,12 +1613,13 @@
                 <button class="tab-btn" data-tab="training">Algorithm</button>
                 <button class="tab-btn" data-tab="inference">Pipeline</button>
                 <button class="tab-btn" data-tab="performance">Metrics</button>
+                <button class="tab-btn" data-tab="deployment">Deployment</button>
                 <button class="tab-btn" data-tab="references">Citations</button>
             </div>
 
             <div class="tp-body">
                 <div class="tc-sidebar">
-                    <div class="badge">Research Paper</div>
+                    <div class="badge">Technical Suite</div>
                     <p
                         style="
                             margin-top: 20px;
@@ -1546,8 +1627,8 @@
                             font-size: 14px;
                         "
                     >
-                        Towards End-to-End Lane Detection: an Instance
-                        Segmentation Approach
+                        Lane Detection Studio: Architecture, Training, and Deployment 
+                        Benchmarks for End-to-End Instance Segmentation.
                     </p>
                 </div>
                 <div class="tc-content">
@@ -1556,281 +1637,189 @@
                         <div class="tc-h2">Visual Intelligence</div>
                         <div class="tc-sub">Lane Detection Studio // MDS</div>
                         <p class="tc-p">
-                            <strong>see lane</strong> implements the
-                            state-of-the-art LaneNet architecture. By leveraging
-                            a single-shot instance segmentation approach, we
-                            provide autonomous systems with the critical ability
-                            to not only identify road lanes but to distinguish
-                            between individual lane instances with pixel-perfect
-                            accuracy.
+                            <strong>Lane Detection Studio</strong> is a production-ready deep learning application for detecting and segmenting road lanes in real-time. Based on the IEEE IV 2018 paper "Towards End-to-End Lane Detection: an Instance Segmentation Approach", this system uses a lightweight ENet encoder combined with dual decoders to produce both binary segmentation masks and instance segmentation results.
                         </p>
                         <p class="tc-p">
-                            The system is trained on the
-                            <strong>TuSimple benchmark</strong> and served via a
-                            Flask REST API. A threading lock prevents concurrent
-                            GPU allocation. Pre-trained weights are loaded from
-                            <code>log/best_model.pth</code>.
+                            The system is trained on the TuSimple benchmark and served via a Flask REST API with a modern, responsive web interface. A threading lock prevents concurrent GPU allocation, ensuring stable inference on single-GPU systems.
                         </p>
-                        <div class="card-grid">
-                            <div class="tc-card">
-                                <div class="tc-card-title">
-                                    Binary Segmentation
-                                </div>
-                                <div class="tc-card-body">
-                                    Classifies every pixel as lane or non-lane.
-                                    Uses Focal Loss to handle severe class
-                                    imbalance — lanes occupy only a small
-                                    fraction of any road image.
-                                </div>
-                            </div>
-                            <div class="tc-card">
-                                <div class="tc-card-title">
-                                    Instance Segmentation
-                                </div>
-                                <div class="tc-card-body">
-                                    Assigns a unique identity to each individual
-                                    lane using Discriminative Loss embeddings.
-                                    No explicit instance labels required during
-                                    training.
-                                </div>
-                            </div>
-                            <div class="tc-card">
-                                <div class="tc-card-title">Input / Output</div>
-                                <div class="tc-card-body">
-                                    Input: RGB images resized to 512 × 256.
-                                    Output: 2-channel binary mask + 3-channel
-                                    RGB instance colour map.
-                                </div>
-                                <span class="tc-tag">512 × 256 px</span>
-                            </div>
-                            <div class="tc-card">
-                                <div class="tc-card-title">Deployment</div>
-                                <div class="tc-card-body">
-                                    Flask web server with Docker support. REST
-                                    endpoint at <code>/predict</code>. Supports
-                                    local, AWS EC2, Heroku, and Kubernetes
-                                    deployments.
-                                </div>
-                                <span class="tc-tag red">Docker Ready</span>
-                            </div>
-                        </div>
+
+                        <h3>Key Features</h3>
+                        <ul>
+                            <li>Real-time lane detection and segmentation</li>
+                            <li>Binary + Instance segmentation simultaneously</li>
+                            <li>Lightweight model (~10MB) optimized for deployment</li>
+                            <li>Multiple backbone options (ENet, U-Net, DeepLabv3+)</li>
+                            <li>Modern web interface with drag-and-drop upload</li>
+                            <li>REST API for integration</li>
+                            <li>Docker ready for easy deployment</li>
+                            <li>Pre-trained weights on TuSimple dataset</li>
+                        </ul>
+
+                        <h3>Core Capabilities</h3>
+                        <ul>
+                            <li>Binary segmentation (lane vs. non-lane pixels)</li>
+                            <li>Instance segmentation (individual lane identification with unique colors)</li>
+                        </ul>
                     </div>
 
                     <!-- ARCHITECTURE -->
                     <div class="tab-pane" id="tab-architecture">
                         <div class="tc-h2">The Blueprint</div>
-                        <div class="tc-sub">
-                            Shared Encoder // Multi-Decoder Branch
-                        </div>
+                        <div class="tc-sub">Shared Encoder // Multi-Decoder Branch</div>
                         <p class="tc-p">
-                            Efficiency is at the core of
-                            <strong>a see lane</strong>. We utilize a shared
-                            encoder that extracts high-dimensional features
-                            once, feeding into independent decoder branches for
-                            semantic and instance tasks. This architectural
-                            elegance ensures low latency without compromising on
-                            spatial resolution.
+                            LaneNet uses a shared encoder feeding into two independent decoders. This architectural elegance ensures low latency without compromising on spatial resolution.
                         </p>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Encoder</td>
+                                    <td>Lightweight ENet (or U-Net/DeepLabv3+ for accuracy)</td>
+                                </tr>
+                                <tr>
+                                    <td>Binary Decoder</td>
+                                    <td>Semantic segmentation (lane pixel detection)</td>
+                                </tr>
+                                <tr>
+                                    <td>Instance Decoder</td>
+                                    <td>Instance segmentation (individual lane identification)</td>
+                                </tr>
+                                <tr>
+                                    <td>Loss Functions</td>
+                                    <td>Focal Loss (binary) + Discriminative Loss (instance)</td>
+                                </tr>
+                                <tr>
+                                    <td>Input</td>
+                                    <td>RGB images (3 channels), resized to 512 × 256</td>
+                                </tr>
+                                <tr>
+                                    <td>Output</td>
+                                    <td>Binary mask (2 channels) + Instance map (3 channels RGB)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h3>Supported Backbones</h3>
                         <div class="card-grid">
                             <div class="tc-card">
-                                <div class="tc-card-title">ENet Engine</div>
+                                <div class="tc-card-title">ENet Engine (Default)</div>
                                 <div class="tc-card-body">
-                                    A lightweight backbone optimized for
-                                    real-time edge deployment. Minimizes
-                                    parameter count while maximizing performance
-                                    via dilated convolutions.
+                                    Optimized for real-time edge deployment. Minimizes parameter count (~3M) while maximizing performance via dilated and asymmetric convolutions.
                                 </div>
-                                <span class="tc-tag">3M Params // 25ms</span>
+                                <span class="tc-tag">3M Params // 25ms Inference</span>
                             </div>
                             <div class="tc-card">
-                                <div class="tc-card-title">DeepLabv3+</div>
+                                <div class="tc-card-title">U-Net Balanced</div>
                                 <div class="tc-card-body">
-                                    For scenarios requiring maximum fidelity.
-                                    Employs Atrous Spatial Pyramid Pooling
-                                    (ASPP) to capture multi-scale context.
+                                    5-level encoder with DoubleConv blocks. Progressive channel expansion and skip connections preserve fine spatial details.
                                 </div>
-                                <span class="tc-tag red"
-                                    >50M Params // 80ms</span
-                                >
+                                <span class="tc-tag">30M Params // 45ms Inference</span>
+                            </div>
+                            <div class="tc-card">
+                                <div class="tc-card-title">DeepLabv3+ Premium</div>
+                                <div class="tc-card-body">
+                                    ResNet-101 backbone with ASPP (Atrous Spatial Pyramid Pooling). Captures multi-scale context for maximum accuracy.
+                                </div>
+                                <span class="tc-tag red">50M Params // 80ms Inference</span>
                             </div>
                         </div>
-                        <p class="tc-p">
-                            <strong>Normalisation stats</strong>: mean [0.485,
-                            0.456, 0.406], std [0.229, 0.224, 0.225] — standard
-                            ImageNet statistics for compatibility with
-                            pre-trained encoder weights.
-                        </p>
                     </div>
 
                     <!-- TRAINING -->
                     <div class="tab-pane" id="tab-training">
                         <div class="tc-h2">Training the Model</div>
-                        <div class="tc-sub">
-                            Loss functions, dataset preparation, and
-                            optimisation strategy.
-                        </div>
+                        <div class="tc-sub">Loss functions, datasets, and optimisation strategy.</div>
                         <p class="tc-p">
-                            The model is trained end-to-end with a combined loss
-                            that weights binary detection
-                            <strong>10×</strong> more than instance separation,
-                            reflecting the primacy of detecting lane pixels
-                            before differentiating them from one another.
+                            The model is trained end-to-end with a combined multi-task loss that emphasizes binary lane detection. Total Loss = 10 × Binary Loss + (0.3 × Var Loss + 1.0 × Dist Loss).
                         </p>
 
                         <div class="formula-block">
-                            <div class="formula-name">
-                                Focal Loss — Binary Segmentation
-                            </div>
-                            <div class="formula-eq">
-                                FL(pt) = -alpha(1-pt)^gamma * log(pt)
-                                &nbsp;&nbsp; gamma=2, alpha=[0.25, 0.75]
-                            </div>
+                            <div class="formula-name">Focal Loss — Binary Segmentation</div>
+                            <div class="formula-eq">FL(pt) = -alpha(1-pt)^gamma * log(pt) &nbsp;&nbsp; gamma=2, alpha=[0.25, 0.75]</div>
                             <div class="formula-desc">
-                                Down-weights the contribution of easy,
-                                correctly-classified background pixels so the
-                                model focuses its learning capacity on the rare
-                                and difficult lane pixels. Weight in combined
-                                loss: <strong>10x</strong>.
+                                Addresses severe class imbalance (<5% lane pixels). Down-weights easy, correctly-classified pixels to focus on difficult lane features.
                             </div>
                         </div>
 
                         <div class="formula-block red">
-                            <div class="formula-name">
-                                Discriminative Loss — Instance Segmentation
-                            </div>
-                            <div class="formula-eq">
-                                L = L_var + L_dist + L_reg &nbsp;&nbsp;
-                                delta_var=0.5, delta_dist=1.5, gamma=0.001
-                            </div>
+                            <div class="formula-name">Discriminative Loss — Instance Segmentation</div>
+                            <div class="formula-eq">L_var (variance) + L_dist (distance) + L_reg (reg)</div>
                             <div class="formula-desc">
-                                <strong>L_var</strong> pulls pixels of the same
-                                lane close to their mean embedding.
-                                <strong>L_dist</strong> pushes different lane
-                                mean embeddings apart.
-                                <strong>L_reg</strong> prevents embeddings
-                                growing unbounded. Combined weight:
-                                <strong>0.3 x L_var + 1.0 x L_dist</strong>.
+                                <strong>L_var</strong> pulls pixels of the same lane close to their mean embedding. <strong>L_dist</strong> pushes different lane mean embeddings apart.
                             </div>
                         </div>
 
+                        <h3>Dataset Preparation</h3>
                         <p class="tc-p">
-                            <strong>Total Loss</strong> = 10 x FocalLoss + 0.3 x
-                            L_var + 1.0 x L_dist
+                            <strong>TuSimple Dataset:</strong> RGB images resized from 1280×720 to 512×256. 
+                            <strong>Augmentation:</strong> ColorJitter (brightness, contrast, saturation, hue each ±0.1) for training stability.
                         </p>
-                        <div class="divider"></div>
-
-                        <p class="tc-p">
-                            <strong>Dataset — TuSimple Benchmark.</strong> Each
-                            training sample contains an RGB image, a binary
-                            ground-truth mask (lane pixel = 1, background = 0),
-                            and an instance mask where each lane is assigned a
-                            unique colour. Data is generated with
-                            <code>tusimple_transform.py</code> which supports
-                            training-only, train+val, or train+val+test splits.
-                        </p>
-
-                        <p class="tc-p">
-                            <strong>Data Augmentation (training only):</strong>
-                            Resize to 256x512 → ColorJitter (brightness,
-                            contrast, saturation, hue each ±0.1) → ToTensor →
-                            ImageNet Normalize. Validation uses resize and
-                            normalise only — no augmentation. Label masks are
-                            resized with INTER_NEAREST to preserve discrete
-                            integer values.
-                        </p>
-
-                        <p class="tc-p">
-                            <strong>Optimiser:</strong> Adam or SGD with
-                            step/exponential learning rate scheduling. Default:
-                            100 epochs, batch size 32, lr = 0.001, weight decay
-                            = 1e-4, validation split = 10%.
-                        </p>
+                        
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Batch Size</td>
+                                    <td>Default 32</td>
+                                </tr>
+                                <tr>
+                                    <td>Optimizer</td>
+                                    <td>Adam or SGD</td>
+                                </tr>
+                                <tr>
+                                    <td>Input Size</td>
+                                    <td>512 × 256</td>
+                                </tr>
+                                <tr>
+                                    <td>Device</td>
+                                    <td>GPU (CUDA) or CPU</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <!-- INFERENCE -->
                     <div class="tab-pane" id="tab-inference">
                         <div class="tc-h2">Inference Pipeline</div>
-                        <div class="tc-sub">
-                            From browser upload to JSON response — step by step.
-                        </div>
+                        <div class="tc-sub">From raw input to JSON-encoded visualization.</div>
                         <div class="steps">
                             <div class="step">
                                 <div class="step-num">1</div>
                                 <div>
-                                    <div class="step-title">Image Upload</div>
-                                    <div class="step-desc">
-                                        User submits a multipart form to
-                                        <code>POST /predict</code>. Flask reads
-                                        the file from
-                                        <code>request.files["image"]</code>.
-                                    </div>
+                                    <div class="step-title">Preprocessing</div>
+                                    <div class="step-desc">Resize to 512 × 256 and apply ImageNet normalization. Tensor moved to CUDA if available.</div>
                                 </div>
                             </div>
                             <div class="step">
                                 <div class="step-num">2</div>
                                 <div>
-                                    <div class="step-title">
-                                        Acquire Inference Lock
-                                    </div>
-                                    <div class="step-desc">
-                                        <code>INFERENCE_LOCK</code>
-                                        (threading.Lock) prevents simultaneous
-                                        forward passes, avoiding GPU memory
-                                        conflicts on shared hardware.
-                                    </div>
+                                    <div class="step-title">Forward Pass</div>
+                                    <div class="step-desc">Encoder extracts features; Binary decoder outputs logits; Instance decoder outputs embeddings.</div>
                                 </div>
                             </div>
                             <div class="step">
                                 <div class="step-num">3</div>
                                 <div>
-                                    <div class="step-title">Preprocess</div>
-                                    <div class="step-desc">
-                                        PIL opens the image. Resize to 512×256 →
-                                        ToTensor → ImageNet Normalize. Tensor
-                                        moved to CUDA if available, else CPU.
-                                    </div>
+                                    <div class="step-title">Post-processing</div>
+                                    <div class="step-desc">Binary: argmax + softmax. Instance: sigmoid probability map.</div>
                                 </div>
                             </div>
                             <div class="step">
                                 <div class="step-num">4</div>
                                 <div>
-                                    <div class="step-title">Forward Pass</div>
-                                    <div class="step-desc">
-                                        LaneNet forward pass produces binary
-                                        logits (2 channels) and instance
-                                        embeddings (3 channels). Weights from
-                                        <code>log/best_model.pth</code>.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">5</div>
-                                <div>
-                                    <div class="step-title">Post-process</div>
-                                    <div class="step-desc">
-                                        Argmax over binary logits produces the
-                                        lane mask. Instance embeddings are
-                                        colour-mapped to a 3-channel RGB output.
-                                        Results saved to
-                                        <code>test_output/</code>.
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">6</div>
-                                <div>
-                                    <div class="step-title">
-                                        Encode &amp; Respond
-                                    </div>
-                                    <div class="step-desc">
-                                        Both images are base64-encoded and
-                                        returned as:
-                                        <code
-                                            >{ "binary_image": "...",
-                                            "instance_image": "..." }</code
-                                        >. The frontend decodes and displays
-                                        them inline.
-                                    </div>
+                                    <div class="step-title">Encode & Respond</div>
+                                    <div class="step-desc">Results base64-encoded and returned as JSON payload to the Studio interface.</div>
                                 </div>
                             </div>
                         </div>
@@ -1838,15 +1827,13 @@
 
                     <!-- PERFORMANCE -->
                     <div class="tab-pane" id="tab-performance">
-                        <div class="tc-h2">Performance Benchmarks</div>
-                        <div class="tc-sub">
-                            Measured on a single NVIDIA V100 GPU with 640×480
-                            images.
-                        </div>
-                        <table class="metrics-table">
+                        <div class="tc-h2">Benchmarks & Metrics</div>
+                        <div class="tc-sub">Measured on NVIDIA V100 GPU with 640×480 images.</div>
+                        
+                        <table>
                             <thead>
                                 <tr>
-                                    <th>Model</th>
+                                    <th>Backbone</th>
                                     <th>Params</th>
                                     <th>Inference</th>
                                     <th>Binary Acc.</th>
@@ -1855,122 +1842,109 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><strong>ENet</strong> (default)</td>
+                                    <td><strong>ENet (default)</strong></td>
                                     <td>3M</td>
                                     <td>25ms</td>
-                                    <td class="val-green">92%</td>
-                                    <td class="val-green">89%</td>
+                                    <td>92%</td>
+                                    <td>89%</td>
                                 </tr>
                                 <tr>
                                     <td><strong>U-Net</strong></td>
                                     <td>30M</td>
                                     <td>45ms</td>
-                                    <td class="val-green">95%</td>
-                                    <td class="val-green">92%</td>
+                                    <td>95%</td>
+                                    <td>92%</td>
                                 </tr>
                                 <tr>
                                     <td><strong>DeepLabv3+</strong></td>
                                     <td>50M</td>
                                     <td>80ms</td>
-                                    <td class="val-green">97%</td>
-                                    <td class="val-green">94%</td>
+                                    <td>97%</td>
+                                    <td>94%</td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="divider"></div>
-                        <p class="tc-p">
-                            <strong>Evaluation Metrics</strong> used throughout
-                            training:
-                        </p>
+
+                        <h3>Evaluation Metrics</h3>
                         <div class="formula-block">
-                            <div class="formula-name">
-                                Dice Coefficient (F1-score)
-                            </div>
-                            <div class="formula-eq">
-                                Dice = 2 * |A∩B| / (|A| + |B|)
-                            </div>
-                            <div class="formula-desc">
-                                Range [0,1]. More robust to class imbalance than
-                                pixel accuracy. Threshold applied at 0.5 for
-                                binarising predictions. Preferred metric for
-                                lane evaluation.
-                            </div>
+                            <div class="formula-name">Dice Coefficient (F1-Score)</div>
+                            <div class="formula-eq">Dice = 2 * |A∩B| / (|A| + |B|)</div>
+                            <div class="formula-desc">Robust to class imbalance. preferred for lane detection where lanes occupy small image regions.</div>
                         </div>
                         <div class="formula-block red">
-                            <div class="formula-name">
-                                Intersection over Union (IoU)
-                            </div>
+                            <div class="formula-name">Intersection over Union (IoU)</div>
                             <div class="formula-eq">IoU = |A∩B| / |A∪B|</div>
-                            <div class="formula-desc">
-                                Range [0,1]. Stricter than Dice — penalises
-                                false positives and false negatives equally.
-                                Standard segmentation benchmark metric.
-                            </div>
+                            <div class="formula-desc">Stricter benchmark metric. Penalises false positives and false negatives equally.</div>
                         </div>
+                    </div>
+
+                    <!-- DEPLOYMENT -->
+                    <div class="tab-pane" id="tab-deployment">
+                        <div class="tc-h2">Deployment Options</div>
+                        <div class="tc-sub">Scale your implementation from Local to Kubernetes.</div>
+                        
+                        <h3>Option 1: Local Development</h3>
+                        <pre>pip install -r requirements.txt
+python app.py</pre>
+
+                        <h3>Option 2: Docker Delivery</h3>
+                        <pre># Build
+docker build -t lane-detection:latest .
+# Run
+docker run -p 5000:5000 lane-detection:latest</pre>
+
+                        <h3>Option 3: AWS / EC2</h3>
+                        <p class="tc-p">Recommended: g4dn.xlarge for GPU acceleration. Run with Gunicorn for production traffic:</p>
+                        <pre>pip install gunicorn
+gunicorn -w 4 -b 0.0.0.0:5000 app:app</pre>
+
+                        <h3>Option 4: Kubernetes</h3>
+                        <pre>kubectl apply -f k8s/deployment.yaml
+kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-port=5000</pre>
                     </div>
 
                     <!-- REFERENCES -->
                     <div class="tab-pane" id="tab-references">
                         <div class="tc-h2">References</div>
-                        <div class="tc-sub">
-                            The research papers this project builds upon.
-                        </div>
+                        <div class="tc-sub">The research papers this project builds upon.</div>
 
-                        <a
-                            class="cite-link"
-                            href="https://arxiv.org/abs/1802.05591"
-                            target="_blank"
-                            rel="noopener"
-                        >
+                        <a class="cite-link" href="https://arxiv.org/abs/1802.05591" target="_blank">
                             <span class="cite-num">[1]</span>
                             <div>
-                                <div class="cite-title">
-                                    Towards End-to-End Lane Detection: an
-                                    Instance Segmentation Approach
-                                </div>
-                                <div class="cite-meta">
-                                    Neven, De Brabandere, Georgoulis, Proesmans,
-                                    Van Gool · 2018 IEEE Intelligent Vehicles
-                                    Symposium · arXiv:1802.05591
-                                </div>
+                                <div class="cite-title">Towards End-to-End Lane Detection: an Instance Segmentation Approach</div>
+                                <div class="cite-meta">Neven, De Brabandere et al. · 2018 IEEE IV · arXiv:1802.05591</div>
                             </div>
                         </a>
 
-                        <a
-                            class="cite-link"
-                            href="https://arxiv.org/abs/1606.02147"
-                            target="_blank"
-                            rel="noopener"
-                        >
+                        <a class="cite-link" href="https://arxiv.org/abs/1606.02147" target="_blank">
                             <span class="cite-num">[2]</span>
                             <div>
-                                <div class="cite-title">
-                                    ENet: A Deep Neural Network Architecture for
-                                    Real-Time Semantic Segmentation
-                                </div>
-                                <div class="cite-meta">
-                                    Paszke, Chaurasia, Kim, Culurciello ·
-                                    arXiv:1606.02147 · 2016
-                                </div>
+                                <div class="cite-title">ENet: A Deep Neural Network Architecture for Real-Time Semantic Segmentation</div>
+                                <div class="cite-meta">Paszke, Chaurasia et al. · arXiv:1606.02147 · 2016</div>
                             </div>
                         </a>
 
-                        <a
-                            class="cite-link"
-                            href="https://arxiv.org/abs/1708.02551"
-                            target="_blank"
-                            rel="noopener"
-                        >
+                        <a class="cite-link" href="https://arxiv.org/abs/1708.02551" target="_blank">
                             <span class="cite-num">[3]</span>
                             <div>
-                                <div class="cite-title">
-                                    Semantic Instance Segmentation with a
-                                    Discriminative Loss Function
-                                </div>
-                                <div class="cite-meta">
-                                    De Brabandere, Neven, Van Gool ·
-                                    arXiv:1708.02551 · 2017
-                                </div>
+                                <div class="cite-title">Semantic Instance Segmentation with a Discriminative Loss Function</div>
+                                <div class="cite-meta">De Brabandere, Neven et al. · arXiv:1708.02551 · 2017</div>
+                            </div>
+                        </a>
+
+                        <a class="cite-link" href="https://arxiv.org/abs/1708.02051" target="_blank">
+                            <span class="cite-num">[4]</span>
+                            <div>
+                                <div class="cite-title">Focal Loss for Dense Object Detection</div>
+                                <div class="cite-meta">Lin, Goyal et al. · ICCV 2017 · arXiv:1708.02051</div>
+                            </div>
+                        </a>
+
+                        <a class="cite-link" href="https://arxiv.org/abs/1802.02611" target="_blank">
+                            <span class="cite-num">[5]</span>
+                            <div>
+                                <div class="cite-title">DeepLabv3+: Encoder-Decoder with Atrous Separable Convolution</div>
+                                <div class="cite-meta">Chen, Zhu et al. · ECCV 2018 · arXiv:1802.02611</div>
                             </div>
                         </a>
 
