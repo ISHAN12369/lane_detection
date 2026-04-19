@@ -11,6 +11,13 @@
         />
         <style>
             :root {
+                --bg: #ede4c8;
+                --bg-card: rgba(255, 255, 255, 0.88);
+                --red: #c41028;
+                --amber: #8a7652;
+                --text: #1a1a1a;
+                --muted: #5a5245;
+                --border: rgba(26, 26, 26, 0.12);
                 --dm-red: #c41028;
                 --dm-bone: #c8bfa8;
                 --dm-bone-light: #d4ccba;
@@ -19,15 +26,12 @@
                 --dm-white: #e8e0d0;
                 --dm-gray: #5a5245;
                 --dm-border: rgba(26, 26, 26, 0.12);
-
                 --font-brand: "Bebas Neue", sans-serif;
                 --font-body: "Outfit", sans-serif;
                 --font-mono: "JetBrains Mono", monospace;
-
-                --radius-sm: 8px;
+                --radius-sm: 6px;
                 --radius-md: 16px;
                 --radius-lg: 40px;
-
                 --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
@@ -38,24 +42,20 @@
                 margin: 0;
                 padding: 0;
             }
+
             html {
                 scroll-behavior: smooth;
             }
 
             body {
-                background: var(--dm-bone);
-                background-image: url("parchment_bg.png");
-                background-size: cover;
-                background-attachment: fixed;
-                background-position: center;
-                color: var(--dm-black);
+                background: #ede4c8;
+                color: #1a1a1a;
                 font-family: var(--font-body);
                 min-height: 100vh;
                 overflow-x: hidden;
                 line-height: 1.5;
             }
 
-            /* Vignette overlay to match logo aesthetic */
             body::before {
                 content: "";
                 position: fixed;
@@ -64,12 +64,12 @@
                 background: radial-gradient(
                     ellipse at center,
                     transparent 40%,
-                    rgba(0, 0, 0, 0.25) 100%
+                    rgba(0, 0, 0, 0.12) 100%
                 );
                 pointer-events: none;
             }
 
-            /* TRANSITION */
+            /* PAGE LOADER */
             .page-loader {
                 position: fixed;
                 inset: 0;
@@ -83,7 +83,6 @@
             .page-loader.ready {
                 transform: translateY(-100%);
             }
-
             .loader-text {
                 font-family: var(--font-brand);
                 font-size: 8vw;
@@ -100,12 +99,14 @@
                 }
             }
 
-            .bg-graph {
+            /* CANVAS */
+            #lanes-canvas {
                 position: fixed;
                 inset: 0;
                 z-index: 0;
                 pointer-events: none;
-                opacity: 0.3;
+                opacity: 0.4;
+                mix-blend-mode: multiply;
             }
 
             /* NAV */
@@ -115,53 +116,19 @@
                 left: 0;
                 right: 0;
                 z-index: 1000;
-                display: grid;
-                grid-template-columns: 1fr auto 1fr;
-                align-items: center;
-                padding: 32px 48px;
-            }
-
-            .nav-brand {
-                font-family: var(--font-brand);
-                font-size: 48px;
-                font-weight: 400;
-                color: var(--dm-red);
-                text-transform: uppercase;
-                letter-spacing: -0.01em;
-                line-height: 0.9;
-                text-align: center;
-                grid-column: 2;
-            }
-
-            /* Animated lanes canvas */
-            #lanes-canvas {
-                position: fixed;
-                inset: 0;
-                z-index: 0;
-                pointer-events: none;
-                opacity: 0.3;
-                mix-blend-mode: multiply;
-            }
-
-            .nav-left {
                 display: flex;
-                align-items: center;
-                gap: 32px;
-                grid-column: 1;
-            }
-            .nav-right {
-                display: flex;
-                align-items: center;
                 justify-content: flex-end;
+                align-items: center;
                 gap: 32px;
-                grid-column: 3;
+                padding: 32px 48px;
+                background: transparent;
             }
 
             .nav-link {
                 font-family: var(--font-brand);
                 font-size: 16px;
                 text-transform: uppercase;
-                color: var(--dm-black);
+                color: #1a1a1a;
                 text-decoration: none;
                 position: relative;
                 letter-spacing: 0.05em;
@@ -191,7 +158,7 @@
                 background: transparent;
                 border: none;
                 cursor: pointer;
-                color: var(--dm-black);
+                color: #1a1a1a;
                 letter-spacing: 0.05em;
                 transition: var(--transition);
             }
@@ -206,178 +173,261 @@
                 text-align: center;
                 padding: 180px 48px 100px;
             }
-
             .hero-eyebrow {
                 font-family: var(--font-mono);
                 font-size: 11px;
                 letter-spacing: 0.3em;
                 text-transform: uppercase;
-                color: var(--dm-gold);
+                color: #8a7652;
                 margin-bottom: 32px;
             }
-
             h1 {
                 font-family: var(--font-brand);
                 font-size: clamp(6rem, 15vw, 18rem);
                 font-weight: 400;
                 line-height: 0.85;
                 letter-spacing: -0.04em;
-                color: var(--dm-red);
+                color: #c41028;
                 margin-bottom: 40px;
                 text-transform: uppercase;
             }
-
             h1 span {
-                display: block;
-                color: var(--dm-black);
+                display: inline;
+                color: #1a1a1a;
             }
-
             .hero-desc {
                 font-family: var(--font-body);
                 font-size: 20px;
                 line-height: 1.6;
-                color: var(--dm-gray);
+                color: #5a5245;
                 max-width: 600px;
                 margin: 0 auto 64px;
                 font-weight: 300;
             }
-
             .hero-badges {
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
                 gap: 16px;
             }
-
             .badge {
                 font-family: var(--font-brand);
                 font-size: 14px;
                 letter-spacing: 0.1em;
                 padding: 8px 20px;
                 border-radius: 999px;
-                border: 1px solid var(--dm-border);
-                color: var(--dm-black);
-                background: var(--dm-white);
+                border: 1px solid rgba(26, 26, 26, 0.2);
+                color: #1a1a1a;
+                background: transparent;
                 text-transform: uppercase;
             }
 
-            /* TOOL */
+            /* TOOL WRAP */
             .tool-wrap {
                 position: relative;
                 z-index: 1;
-                max-width: 1400px;
+                max-width: 860px;
                 margin: 0 auto;
-                padding: 64px 48px;
+                padding: 0 48px 80px;
             }
 
-            .controls {
+            /* CONTROLS BAR — Row 1: mode tabs left, upload trigger right */
+            .controls-bar {
                 display: flex;
                 align-items: center;
-                justify-content: center;
-                gap: 24px;
-                flex-wrap: wrap;
-                margin-bottom: 48px;
+                justify-content: space-between;
+                gap: 16px;
+                margin-bottom: 16px;
             }
 
-            #file-input {
-                display: none;
-            }
-
-            .btn-upload {
-                display: inline-flex;
+            /* FILENAME ROW */
+            .filename-row {
+                display: flex;
                 align-items: center;
                 gap: 12px;
-                padding: 16px 32px;
-                border: 1.5px solid var(--dm-border);
-                border-radius: var(--radius-lg);
-                background: var(--dm-white);
-                color: var(--dm-black);
+                margin-bottom: 12px;
+                min-height: 22px;
+            }
+
+            /* ACTION BAR — Row 2: full-width run button */
+            .action-bar {
+                margin-bottom: 20px;
+            }
+
+            /* MODE SELECTOR */
+            .mode-selector {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .btn-mode {
                 font-family: var(--font-brand);
-                font-size: 18px;
+                font-size: 16px;
+                letter-spacing: 0.1em;
                 text-transform: uppercase;
+                padding: 10px 28px;
+                border-radius: 999px;
+                border: 1.5px solid var(--dm-border);
+                background: transparent;
+                color: var(--dm-gray);
                 cursor: pointer;
                 transition: var(--transition);
             }
+            .btn-mode:hover {
+                color: #1a1a1a;
+                border-color: #1a1a1a;
+            }
+            .btn-mode.active {
+                background: var(--dm-red);
+                color: var(--dm-bone);
+                border-color: var(--dm-red);
+            }
 
+            /* UPLOAD BUTTON */
+            .btn-upload {
+                display: inline-flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px 20px;
+                border: 1.5px solid rgba(26, 26, 26, 0.25);
+                border-radius: var(--radius-sm);
+                background: transparent;
+                color: #1a1a1a;
+                font-family: var(--font-brand);
+                font-size: 16px;
+                text-transform: uppercase;
+                cursor: pointer;
+                transition: var(--transition);
+                letter-spacing: 0.05em;
+            }
             .btn-upload:hover {
                 border-color: var(--dm-red);
                 color: var(--dm-red);
             }
 
+            /* RUN BUTTON */
+            #upload-form {
+                width: 100%;
+            }
             .btn-run {
-                display: inline-flex;
+                display: flex;
                 align-items: center;
+                justify-content: center;
                 gap: 12px;
-                padding: 16px 48px;
+                padding: 18px 48px;
+                width: 100%;
                 border: none;
-                border-radius: var(--radius-lg);
-                background: var(--dm-red);
-                color: var(--dm-bone);
+                border-radius: 6px;
+                background: #c41028;
+                color: #ede4c8;
                 font-family: var(--font-brand);
-                font-size: 18px;
+                font-size: 20px;
                 text-transform: uppercase;
                 cursor: pointer;
                 transition: var(--transition);
-                letter-spacing: 0.02em;
+                letter-spacing: 0.04em;
             }
-
             .btn-run:hover:not(:disabled) {
-                background: var(--dm-black);
-                transform: scale(1.02);
+                background: #1a1a1a;
             }
-
             .btn-run:disabled {
                 opacity: 0.4;
                 cursor: not-allowed;
             }
 
+            /* FILENAME TAG */
             .filename-tag {
                 font-family: var(--font-mono);
                 font-size: 12px;
                 color: var(--dm-gray);
-                padding: 8px 16px;
+                padding: 4px 12px;
                 border-radius: var(--radius-sm);
                 background: rgba(255, 255, 255, 0.4);
             }
 
+            /* STATUS BAR */
+            .status-bar {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-family: var(--font-mono);
+                font-size: 12px;
+                color: #5a5245;
+                letter-spacing: 0.05em;
+                margin-bottom: 20px;
+                padding: 12px 20px;
+                border-radius: var(--radius-sm);
+                background: rgba(26, 26, 26, 0.05);
+                border: 1px solid rgba(26, 26, 26, 0.1);
+            }
+            .status-bar.loading {
+                color: #8a7652;
+                border-color: rgba(138, 118, 82, 0.3);
+            }
+            .status-bar.error {
+                color: #c41028;
+                border-color: rgba(196, 16, 40, 0.25);
+            }
+            .sdot {
+                width: 7px;
+                height: 7px;
+                border-radius: 50%;
+                flex-shrink: 0;
+                background: #5a5245;
+            }
+            .status-bar.loading .sdot {
+                background: #8a7652;
+                animation: pulse 1.2s ease infinite;
+            }
+            .status-bar.error .sdot {
+                background: #c41028;
+            }
+            @keyframes pulse {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.3;
+                }
+            }
+
+            /* PREVIEW GRID */
             .preview-grid {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
-                gap: 32px;
+                gap: 24px;
             }
 
+            /* PANEL */
             .panel {
-                border-radius: var(--radius-lg);
+                border-radius: var(--radius-md);
                 overflow: hidden;
-                background: var(--dm-white);
-                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+                background: rgba(255, 255, 255, 0.88);
+                box-shadow: 0 4px 24px rgba(0, 0, 0, 0.09);
                 transition: var(--transition);
-                border: 1px solid var(--dm-border);
+                border: 1px solid rgba(26, 26, 26, 0.08);
             }
-
             .panel:hover {
-                transform: translateY(-8px);
-                box-shadow: 0 40px 100px rgba(0, 0, 0, 0.15);
+                transform: translateY(-4px);
+                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.13);
             }
-
             .panel-head {
                 padding: 16px 18px 14px;
-                border-bottom: 1px solid var(--dm-border);
+                border-bottom: 1px solid rgba(26, 26, 26, 0.08);
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                background: rgba(200, 191, 168, 0.4);
+                background: rgba(237, 228, 200, 0.5);
             }
-
             .panel-title {
                 font-family: var(--font-brand);
                 font-size: 18px;
                 font-weight: 400;
-                color: var(--dm-black);
+                color: #1a1a1a;
                 text-transform: uppercase;
                 letter-spacing: 0.05em;
             }
-
             .panel-chip {
                 font-family: var(--font-mono);
                 font-size: 9px;
@@ -385,7 +435,6 @@
                 padding: 3px 9px;
                 border-radius: 3px;
             }
-
             .chip-raw {
                 background: rgba(26, 26, 26, 0.08);
                 color: var(--dm-gray);
@@ -402,27 +451,26 @@
                 border: 1px solid rgba(138, 118, 82, 0.3);
             }
 
+            /* IMAGE FRAME */
             .image-frame {
                 position: relative;
                 min-height: 280px;
                 display: grid;
                 place-items: center;
-                background: var(--dm-bone-light);
+                background: #e8e0d0;
                 overflow: hidden;
             }
-
             .image-frame img {
                 width: 100%;
                 height: 100%;
                 object-fit: contain;
                 display: none;
-                background: var(--dm-bone-light);
+                background: #e8e0d0;
             }
             .image-frame img.visible {
                 display: block;
                 animation: fadeIn 0.3s ease;
             }
-
             .overlay-img {
                 display: block !important;
                 position: absolute;
@@ -439,7 +487,6 @@
             .overlay-img.active {
                 opacity: 0.5;
             }
-
             .toggle-overlay {
                 font-family: var(--font-mono);
                 font-size: 10px;
@@ -462,7 +509,6 @@
                 color: var(--dm-white);
                 border-color: var(--dm-red);
             }
-
             @keyframes fadeIn {
                 from {
                     opacity: 0;
@@ -471,17 +517,15 @@
                     opacity: 1;
                 }
             }
-
             .ph {
                 font-family: var(--font-body);
                 font-size: 13px;
-                color: var(--dm-gray);
+                color: #5a5245;
                 text-align: center;
                 padding: 24px;
                 line-height: 1.8;
                 font-style: italic;
             }
-
             .spinner {
                 width: 38px;
                 height: 38px;
@@ -491,7 +535,6 @@
                 animation: spin 0.85s linear infinite;
                 display: none;
             }
-
             .spinner.visible {
                 display: block;
             }
@@ -499,6 +542,93 @@
                 to {
                     transform: rotate(360deg);
                 }
+            }
+
+            /* VIDEO MODE */
+            .video-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .video-panel video {
+                width: 100%;
+                border-radius: var(--radius-sm);
+                background: #e8e0d0;
+                max-height: 240px;
+            }
+            .btn-download {
+                font-family: var(--font-mono);
+                font-size: 11px;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                padding: 6px 16px;
+                border-radius: 999px;
+                border: 1px solid var(--dm-border);
+                background: transparent;
+                color: var(--dm-gray);
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                transition: var(--transition);
+            }
+            .btn-download:hover {
+                color: var(--dm-red);
+                border-color: var(--dm-red);
+            }
+
+            /* LIVE MODE */
+            .live-controls {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 16px;
+                flex-wrap: wrap;
+            }
+            .btn-live {
+                font-family: var(--font-brand);
+                font-size: 15px;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+                padding: 10px 28px;
+                border-radius: 999px;
+                border: 1.5px solid;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+            .btn-start {
+                background: var(--dm-red);
+                color: var(--dm-bone);
+                border-color: var(--dm-red);
+            }
+            .btn-start:hover {
+                opacity: 0.85;
+            }
+            .btn-stop {
+                background: transparent;
+                color: #1a1a1a;
+                border-color: var(--dm-border);
+            }
+            .btn-stop:hover {
+                color: #1a1a1a;
+                border-color: #1a1a1a;
+            }
+            .btn-stop:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+            .fps-badge {
+                font-family: var(--font-mono);
+                font-size: 12px;
+                color: #8a7652;
+                letter-spacing: 0.1em;
+                padding: 6px 14px;
+                border: 1px solid rgba(138, 118, 82, 0.4);
+                border-radius: 999px;
+            }
+            .live-video-frame {
+                width: 100%;
+                border-radius: var(--radius-sm);
+                background: #e8e0d0;
             }
 
             /* THEORY OVERLAY */
@@ -512,12 +642,10 @@
                 pointer-events: none;
                 transition: opacity 0.5s ease;
             }
-
             .overlay-backdrop.open {
                 opacity: 1;
                 pointer-events: all;
             }
-
             .theory-panel {
                 position: fixed;
                 inset: 0;
@@ -529,11 +657,9 @@
                 transition: transform 0.8s cubic-bezier(0.85, 0, 0.15, 1);
                 overflow: hidden;
             }
-
             .theory-panel.open {
                 transform: translateY(0);
             }
-
             .tp-header {
                 padding: 48px;
                 border-bottom: 1.5px solid var(--dm-red);
@@ -542,7 +668,6 @@
                 justify-content: space-between;
                 flex-shrink: 0;
             }
-
             .tp-brand {
                 font-family: var(--font-brand);
                 font-size: 80px;
@@ -550,7 +675,6 @@
                 line-height: 0.8;
                 text-transform: uppercase;
             }
-
             .tp-close {
                 font-family: var(--font-brand);
                 font-size: 24px;
@@ -565,7 +689,6 @@
             .tp-close:hover {
                 color: var(--dm-red);
             }
-
             .tp-tabs {
                 display: flex;
                 gap: 40px;
@@ -575,7 +698,6 @@
                 align-items: center;
                 flex-shrink: 0;
             }
-
             .tab-btn {
                 font-family: var(--font-brand);
                 font-size: 16px;
@@ -603,7 +725,6 @@
                 height: 3px;
                 background: var(--dm-red);
             }
-
             .tp-body {
                 flex: 1;
                 overflow-y: auto;
@@ -612,7 +733,6 @@
                 grid-template-columns: 300px 1fr;
                 gap: 80px;
             }
-
             .tc-sidebar {
                 position: sticky;
                 top: 0;
@@ -620,7 +740,6 @@
             .tc-content {
                 max-width: 800px;
             }
-
             .tc-h2 {
                 font-family: var(--font-brand);
                 font-size: 64px;
@@ -638,7 +757,6 @@
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
             }
-
             .tc-p {
                 font-family: var(--font-body);
                 font-size: 16px;
@@ -651,14 +769,12 @@
                 font-weight: 600;
                 color: var(--dm-red);
             }
-
             .card-grid {
                 display: grid;
                 grid-template-columns: 1fr;
                 gap: 24px;
                 margin-bottom: 40px;
             }
-
             .tc-card {
                 padding: 32px;
                 border-radius: var(--radius-md);
@@ -669,7 +785,6 @@
             .tc-card:hover {
                 border-color: var(--dm-red);
             }
-
             .tc-card-title {
                 font-family: var(--font-brand);
                 font-size: 24px;
@@ -683,144 +798,130 @@
                 color: var(--dm-gray);
                 line-height: 1.6;
             }
-
             .tc-tag {
                 display: inline-block;
                 margin-top: 8px;
-                font-family: var(--mono);
+                font-family: var(--font-mono);
                 font-size: 9px;
                 letter-spacing: 0.08em;
                 padding: 3px 9px;
                 border-radius: 3px;
                 background: rgba(184, 134, 11, 0.12);
-                color: var(--gold);
+                color: var(--dm-gold);
                 border: 1px solid rgba(184, 134, 11, 0.25);
             }
-
             .tc-tag.red {
-                background: rgba(122, 31, 46, 0.1);
-                color: var(--burgundy);
-                border-color: rgba(122, 31, 46, 0.25);
+                background: rgba(196, 16, 40, 0.1);
+                color: var(--dm-red);
+                border-color: rgba(196, 16, 40, 0.25);
             }
-
             .formula-block {
                 background: rgba(255, 255, 255, 0.7);
-                border: 1px solid var(--border);
-                border-left: 3px solid var(--gold);
+                border: 1px solid var(--dm-border);
+                border-left: 3px solid var(--dm-gold);
                 border-radius: 8px;
                 padding: 14px 18px;
                 margin-bottom: 14px;
             }
-
             .formula-block.red {
-                border-left-color: var(--burgundy);
+                border-left-color: var(--dm-red);
             }
-
             .formula-name {
-                font-family: var(--serif);
+                font-family: var(--font-brand);
                 font-size: 14px;
                 font-weight: 700;
-                color: var(--text);
+                color: var(--dm-black);
                 margin-bottom: 5px;
             }
             .formula-eq {
-                font-family: var(--mono);
+                font-family: var(--font-mono);
                 font-size: 12px;
-                color: var(--gold);
+                color: var(--dm-gold);
                 margin-bottom: 7px;
             }
             .formula-block.red .formula-eq {
-                color: var(--burgundy);
+                color: var(--dm-red);
             }
             .formula-desc {
-                font-family: var(--body);
+                font-family: var(--font-body);
                 font-size: 12.5px;
-                color: var(--muted);
+                color: var(--dm-gray);
                 line-height: 1.7;
             }
             .formula-desc strong {
-                color: var(--text2);
+                color: var(--dm-black);
             }
-
             .steps {
                 display: flex;
                 flex-direction: column;
             }
-
             .step {
                 display: flex;
                 gap: 16px;
                 align-items: flex-start;
                 padding: 14px 0;
-                border-bottom: 1px solid var(--border);
+                border-bottom: 1px solid var(--dm-border);
             }
-
             .step:last-child {
                 border-bottom: none;
             }
-
             .step-num {
                 flex-shrink: 0;
                 width: 28px;
                 height: 28px;
                 border-radius: 50%;
-                border: 1.5px solid var(--burgundy);
+                border: 1.5px solid var(--dm-red);
                 display: grid;
                 place-items: center;
-                font-family: var(--mono);
+                font-family: var(--font-mono);
                 font-size: 11px;
                 font-weight: 500;
-                color: var(--burgundy);
+                color: var(--dm-red);
                 margin-top: 1px;
             }
-
             .step-title {
-                font-family: var(--serif);
+                font-family: var(--font-brand);
                 font-size: 14px;
                 font-weight: 700;
-                color: var(--text);
+                color: var(--dm-black);
                 margin-bottom: 3px;
             }
             .step-desc {
-                font-family: var(--body);
+                font-family: var(--font-body);
                 font-size: 12.5px;
-                color: var(--muted);
+                color: var(--dm-gray);
                 line-height: 1.7;
             }
             .step-desc code {
-                font-family: var(--mono);
+                font-family: var(--font-mono);
                 font-size: 11px;
-                background: rgba(122, 31, 46, 0.08);
+                background: rgba(196, 16, 40, 0.08);
                 padding: 1px 4px;
                 border-radius: 3px;
             }
-
             .metrics-table {
                 width: 100%;
                 border-collapse: collapse;
                 margin-bottom: 20px;
             }
-
             .metrics-table th {
-                font-family: var(--mono);
+                font-family: var(--font-mono);
                 font-size: 10px;
                 letter-spacing: 0.14em;
                 text-transform: uppercase;
-                color: var(--muted);
+                color: var(--dm-gray);
                 padding: 10px 12px;
                 text-align: left;
-                border-bottom: 1px solid var(--border2);
+                border-bottom: 1px solid var(--dm-border);
                 background: rgba(255, 255, 255, 0.5);
             }
-
             .metrics-table td {
-                font-family: var(--body);
+                font-family: var(--font-body);
                 font-size: 13px;
-                color: var(--text2);
+                color: var(--dm-black);
                 padding: 11px 12px;
-                border-bottom: 1px solid var(--border);
+                border-bottom: 1px solid var(--dm-border);
             }
-
             .metrics-table tr:hover td {
                 background: rgba(255, 255, 255, 0.5);
             }
@@ -828,13 +929,12 @@
                 color: #1a7a4a;
                 font-weight: 600;
             }
-
             .cite-link {
                 display: flex;
                 align-items: flex-start;
                 gap: 14px;
                 padding: 14px 16px;
-                border: 1px solid var(--border);
+                border: 1px solid var(--dm-border);
                 border-radius: 10px;
                 background: rgba(255, 255, 255, 0.5);
                 margin-bottom: 12px;
@@ -843,245 +943,81 @@
                     border-color 0.2s,
                     background 0.2s;
             }
-
             .cite-link:hover {
-                border-color: var(--burgundy);
-                background: rgba(122, 31, 46, 0.04);
+                border-color: var(--dm-red);
+                background: rgba(196, 16, 40, 0.04);
             }
-
             .cite-num {
                 flex-shrink: 0;
-                font-family: var(--mono);
+                font-family: var(--font-mono);
                 font-size: 11px;
-                color: var(--gold);
+                color: var(--dm-gold);
                 margin-top: 2px;
             }
             .cite-title {
-                font-family: var(--serif);
+                font-family: var(--font-brand);
                 font-size: 13.5px;
                 font-weight: 700;
-                color: var(--burgundy);
+                color: var(--dm-red);
                 margin-bottom: 3px;
             }
             .cite-meta {
-                font-family: var(--body);
+                font-family: var(--font-body);
                 font-size: 12px;
-                color: var(--muted);
+                color: var(--dm-gray);
                 font-style: italic;
             }
-
             .divider {
                 height: 1px;
-                background: var(--border);
+                background: var(--dm-border);
                 margin: 22px 0;
             }
 
-            /* STATUS BAR */
-            .status-bar {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                font-family: var(--font-mono);
-                font-size: 12px;
-                color: var(--dm-gray);
-                letter-spacing: 0.05em;
-                margin-bottom: 40px;
-                padding: 12px 20px;
-                border-radius: var(--radius-sm);
-                background: rgba(255, 255, 255, 0.35);
-                border: 1px solid var(--dm-border);
+            /* TAB PANES */
+            .tab-pane {
+                display: none;
             }
-            .status-bar.loading {
-                color: var(--dm-gold);
-                border-color: rgba(138, 118, 82, 0.3);
-            }
-            .status-bar.error {
-                color: var(--dm-red);
-                border-color: rgba(196, 16, 40, 0.25);
-            }
-            .sdot {
-                width: 7px;
-                height: 7px;
-                border-radius: 50%;
-                flex-shrink: 0;
-                background: var(--dm-gray);
-            }
-            .status-bar.loading .sdot {
-                background: var(--dm-gold);
-                animation: pulse 1.2s ease infinite;
-            }
-            .status-bar.error .sdot {
-                background: var(--dm-red);
-            }
-            @keyframes pulse {
-                0%,
-                100% {
-                    opacity: 1;
-                }
-                50% {
-                    opacity: 0.3;
-                }
+            .tab-pane.active {
+                display: block;
             }
 
             /* RESPONSIVE */
             @media (max-width: 768px) {
                 nav {
-                    padding: 0 20px;
+                    padding: 16px 20px;
+                    gap: 16px;
                 }
                 .hero {
-                    padding: 48px 20px 40px;
+                    padding: 100px 20px 60px;
                 }
                 .tool-wrap {
-                    padding: 32px 20px 48px;
+                    padding: 0 20px 48px;
                 }
                 .preview-grid {
                     grid-template-columns: 1fr;
                 }
-                .card-grid {
-                    grid-template-columns: 1fr;
+                .controls-bar {
+                    flex-wrap: wrap;
                 }
                 .theory-panel {
                     width: 100vw;
                 }
                 .tp-body {
+                    grid-template-columns: 1fr;
                     padding: 20px;
+                    gap: 40px;
                 }
                 .tp-tabs {
                     padding: 12px 20px;
+                    gap: 20px;
+                    overflow-x: auto;
                 }
                 .tp-header {
                     padding: 20px;
                 }
-            }
-
-            /* ── MODE SELECTOR ─────────────────────────────────────────── */
-            .mode-selector {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 8px;
-                margin-bottom: 40px;
-            }
-            .btn-mode {
-                font-family: var(--font-brand);
-                font-size: 16px;
-                letter-spacing: 0.1em;
-                text-transform: uppercase;
-                padding: 10px 28px;
-                border-radius: 999px;
-                border: 1.5px solid var(--dm-border);
-                background: transparent;
-                color: var(--dm-gray);
-                cursor: pointer;
-                transition: var(--transition);
-            }
-            .btn-mode:hover {
-                color: var(--dm-black);
-                border-color: var(--dm-black);
-            }
-            .btn-mode.active {
-                background: var(--dm-red);
-                color: var(--dm-bone);
-                border-color: var(--dm-red);
-            }
-
-            /* ── VIDEO MODE ────────────────────────────────────────────── */
-            .video-controls {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 24px;
-                flex-wrap: wrap;
-                margin-bottom: 48px;
-            }
-            #video-file-input {
-                display: none;
-            }
-            .video-panel {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-            }
-            .video-panel video {
-                width: 100%;
-                border-radius: var(--radius-sm);
-                background: #111;
-                max-height: 240px;
-            }
-            .btn-download {
-                font-family: var(--font-mono);
-                font-size: 11px;
-                letter-spacing: 0.1em;
-                text-transform: uppercase;
-                padding: 6px 16px;
-                border-radius: 999px;
-                border: 1px solid var(--dm-border);
-                background: transparent;
-                color: var(--dm-gray);
-                cursor: pointer;
-                text-decoration: none;
-                display: inline-block;
-                transition: var(--transition);
-            }
-            .btn-download:hover {
-                color: var(--dm-red);
-                border-color: var(--dm-red);
-            }
-
-            /* ── LIVE MODE ─────────────────────────────────────────────── */
-            .live-controls {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 16px;
-                flex-wrap: wrap;
-                margin-bottom: 48px;
-            }
-            .btn-live {
-                font-family: var(--font-brand);
-                font-size: 15px;
-                letter-spacing: 0.08em;
-                text-transform: uppercase;
-                padding: 10px 28px;
-                border-radius: 999px;
-                border: 1.5px solid;
-                cursor: pointer;
-                transition: var(--transition);
-            }
-            .btn-start {
-                background: var(--dm-red);
-                color: var(--dm-bone);
-                border-color: var(--dm-red);
-            }
-            .btn-start:hover {
-                opacity: 0.85;
-            }
-            .btn-stop {
-                background: transparent;
-                color: var(--dm-gray);
-                border-color: var(--dm-border);
-            }
-            .btn-stop:hover {
-                color: var(--dm-black);
-                border-color: var(--dm-black);
-            }
-            .btn-stop:disabled {
-                opacity: 0.4;
-                cursor: not-allowed;
-            }
-            .fps-badge {
-                font-family: var(--font-mono);
-                font-size: 12px;
-                color: var(--dm-gold);
-                letter-spacing: 0.1em;
-                padding: 6px 14px;
-                border: 1px solid var(--dm-border);
-                border-radius: 999px;
-            }
-            .live-video-frame {
-                width: 100%;
-                border-radius: var(--radius-sm);
-                background: #111;
+                .tc-sidebar {
+                    position: static;
+                }
             }
         </style>
     </head>
@@ -1133,168 +1069,50 @@
 
         <!-- TOOL -->
         <main class="tool-wrap">
-            <!-- MODE SELECTOR -->
-            <div class="mode-selector">
-                <button class="btn-mode active" data-mode="photo">Photo</button>
-                <button class="btn-mode" data-mode="video">Video</button>
-                <button class="btn-mode" data-mode="live">Live</button>
-            </div>
+            <!-- ROW 1: mode tabs (left) + upload trigger (right) -->
+            <div class="controls-bar">
+                <div class="mode-selector">
+                    <button class="btn-mode active" data-mode="photo">
+                        Photo
+                    </button>
+                    <button class="btn-mode" data-mode="video">Video</button>
+                    <button class="btn-mode" data-mode="live">Live</button>
+                </div>
 
-            <!-- ── PHOTO CONTROLS ──────────────────────────────────────── -->
-            <div id="photo-controls">
-                <form id="upload-form">
-                    <div class="controls">
-                        <input
-                            id="file-input"
-                            name="image"
-                            type="file"
-                            accept="image/*"
-                        />
-                        <label for="file-input" class="btn-upload">
-                            <svg
-                                width="14"
-                                height="14"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                            >
-                                <path
-                                    d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"
-                                />
-                                <polyline points="17 8 12 3 7 8" />
-                                <line x1="12" y1="3" x2="12" y2="15" />
-                            </svg>
-                            Choose Image
-                        </label>
-                        <button type="submit" class="btn-run" id="run-button">
-                            <svg
-                                width="13"
-                                height="13"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2.5"
-                            >
-                                <polygon points="5 3 19 12 5 21 5 3" />
-                            </svg>
-                            Run Detection
-                        </button>
-                        <span class="filename-tag" id="filename"
-                            >No file selected</span
+                <!-- Photo upload trigger -->
+                <div id="photo-trigger">
+                    <input
+                        id="file-input"
+                        name="image"
+                        type="file"
+                        accept="image/*"
+                        style="display: none"
+                    />
+                    <label for="file-input" class="btn-upload">
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
                         >
-                    </div>
-                </form>
-
-                <div class="status-bar" id="status-bar">
-                    <span class="sdot"></span>
-                    <span id="status-text">Select an image to begin.</span>
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                            <polyline points="17 8 12 3 7 8" />
+                            <line x1="12" y1="3" x2="12" y2="15" />
+                        </svg>
+                        Choose Image
+                    </label>
                 </div>
 
-                <div class="preview-grid" id="photo-grid">
-                    <div class="panel">
-                        <div class="panel-head">
-                            <span class="panel-title">Uploaded Image</span>
-                            <span class="panel-chip chip-raw">RAW</span>
-                        </div>
-                        <div class="image-frame">
-                            <img id="input-preview" alt="Uploaded image" />
-                            <div class="ph" id="ph-input">
-                                Your selected image<br />will appear here.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="panel" id="binary-panel">
-                        <div class="panel-head">
-                            <span class="panel-title">Binary Segmentation</span>
-                            <div
-                                style="
-                                    display: flex;
-                                    gap: 8px;
-                                    align-items: center;
-                                "
-                            >
-                                <button
-                                    class="toggle-overlay"
-                                    id="toggle-binary"
-                                    title="Toggle original image overlay"
-                                >
-                                    Overlay
-                                </button>
-                                <span class="panel-chip chip-binary"
-                                    >FOCAL LOSS</span
-                                >
-                            </div>
-                        </div>
-                        <div class="image-frame">
-                            <img
-                                id="binary-preview"
-                                alt="Binary segmentation"
-                            />
-                            <img
-                                class="overlay-img"
-                                id="binary-overlay"
-                                alt="Original overlay"
-                            />
-                            <div class="spinner" id="spinner"></div>
-                            <div class="ph" id="ph-binary">
-                                Binary lane mask<br />will appear here.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="panel" id="instance-panel">
-                        <div class="panel-head">
-                            <span class="panel-title"
-                                >Instance Segmentation</span
-                            >
-                            <div
-                                style="
-                                    display: flex;
-                                    gap: 8px;
-                                    align-items: center;
-                                "
-                            >
-                                <button
-                                    class="toggle-overlay"
-                                    id="toggle-instance"
-                                    title="Toggle original image overlay"
-                                >
-                                    Overlay
-                                </button>
-                                <span class="panel-chip chip-instance"
-                                    >DISC. LOSS</span
-                                >
-                            </div>
-                        </div>
-                        <div class="image-frame">
-                            <img
-                                id="instance-preview"
-                                alt="Instance segmentation"
-                            />
-                            <img
-                                class="overlay-img"
-                                id="instance-overlay"
-                                alt="Original overlay"
-                            />
-                            <div class="spinner" id="spinner-instance"></div>
-                            <div class="ph" id="ph-instance">
-                                Instance segmentation<br />will appear here.
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── VIDEO CONTROLS ─────────────────────────────────────── -->
-            <div id="video-controls" style="display: none">
-                <div class="video-controls">
+                <!-- Video upload trigger -->
+                <div id="video-trigger" style="display: none">
                     <input
                         id="video-file-input"
                         name="video"
                         type="file"
                         accept=".mp4,.avi,.mov,.mkv"
+                        style="display: none"
                     />
                     <label for="video-file-input" class="btn-upload">
                         <svg
@@ -1311,7 +1129,53 @@
                         </svg>
                         Choose Video
                     </label>
-                    <button class="btn-run" id="video-run-button" disabled>
+                </div>
+
+                <!-- Live trigger: just FPS badge -->
+                <div id="live-trigger" style="display: none">
+                    <span class="fps-badge" id="fps-display">-- FPS</span>
+                </div>
+            </div>
+
+            <!-- FILENAME ROW -->
+            <div class="filename-row">
+                <span class="filename-tag" id="filename">No file selected</span>
+                <span
+                    class="filename-tag"
+                    id="video-filename"
+                    style="display: none"
+                    >No file selected</span
+                >
+            </div>
+
+            <!-- ROW 2: action button (full width) -->
+            <div class="action-bar">
+                <!-- Photo -->
+                <div id="photo-action">
+                    <form id="upload-form" style="width: 100%">
+                        <button type="submit" class="btn-run" id="run-button">
+                            <svg
+                                width="13"
+                                height="13"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                            >
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                            Run Detection
+                        </button>
+                    </form>
+                </div>
+                <!-- Video -->
+                <div id="video-action" style="display: none; width: 100%">
+                    <button
+                        class="btn-run"
+                        id="video-run-button"
+                        disabled
+                        style="width: 100%"
+                    >
                         <svg
                             width="13"
                             height="13"
@@ -1324,194 +1188,259 @@
                         </svg>
                         Process Video
                     </button>
-                    <span class="filename-tag" id="video-filename"
-                        >No file selected</span
-                    >
                 </div>
-
-                <div class="status-bar" id="video-status-bar">
-                    <span class="sdot"></span>
-                    <span id="video-status-text"
-                        >Select a video file to begin.</span
-                    >
-                </div>
-
-                <div class="preview-grid" id="video-grid">
-                    <div class="panel video-panel">
-                        <div class="panel-head">
-                            <span class="panel-title">Original Video</span>
-                            <span class="panel-chip chip-raw">RAW</span>
-                        </div>
-                        <div
-                            class="image-frame"
-                            style="height: auto; padding: 12px"
-                        >
-                            <video
-                                id="raw-video"
-                                controls
-                                style="
-                                    display: none;
-                                    width: 100%;
-                                    border-radius: var(--radius-sm);
-                                "
-                            ></video>
-                            <div class="ph" id="ph-raw-video">
-                                Uploaded video<br />will appear here.
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="panel video-panel">
-                        <div class="panel-head">
-                            <span class="panel-title"
-                                >Binary Segmentation Video</span
-                            >
-                            <span class="panel-chip chip-binary"
-                                >FOCAL LOSS</span
-                            >
-                        </div>
-                        <div
-                            class="image-frame"
-                            style="height: auto; padding: 12px"
-                        >
-                            <video
-                                id="binary-video"
-                                controls
-                                style="display: none"
-                            ></video>
-                            <div class="ph" id="ph-binary-video">
-                                Binary output video<br />will appear here.
-                            </div>
-                            <div
-                                class="spinner"
-                                id="video-spinner-binary"
-                            ></div>
-                        </div>
-                        <a
-                            id="binary-video-download"
-                            class="btn-download"
-                            style="display: none; margin: 8px 0 0 0"
-                            download="binary_lanes.mp4"
-                            >Download Binary Video</a
-                        >
-                    </div>
-
-                    <div class="panel video-panel">
-                        <div class="panel-head">
-                            <span class="panel-title"
-                                >Instance Segmentation Video</span
-                            >
-                            <span class="panel-chip chip-instance"
-                                >DISC. LOSS</span
-                            >
-                        </div>
-                        <div
-                            class="image-frame"
-                            style="height: auto; padding: 12px"
-                        >
-                            <video
-                                id="instance-video"
-                                controls
-                                style="display: none"
-                            ></video>
-                            <div class="ph" id="ph-instance-video">
-                                Instance output video<br />will appear here.
-                            </div>
-                            <div
-                                class="spinner"
-                                id="video-spinner-instance"
-                            ></div>
-                        </div>
-                        <a
-                            id="instance-video-download"
-                            class="btn-download"
-                            style="display: none; margin: 8px 0 0 0"
-                            download="instance_lanes.mp4"
-                            >Download Instance Video</a
-                        >
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── LIVE CONTROLS ──────────────────────────────────────── -->
-            <div id="live-controls" style="display: none">
-                <div class="live-controls">
+                <!-- Live -->
+                <div
+                    id="live-action"
+                    class="live-controls"
+                    style="display: none"
+                >
                     <button class="btn-live btn-start" id="start-camera">
                         Start Camera
                     </button>
                     <button class="btn-live btn-stop" id="stop-camera" disabled>
                         Stop Camera
                     </button>
-                    <span class="fps-badge" id="fps-display">-- FPS</span>
+                </div>
+            </div>
+
+            <!-- STATUS BARS -->
+            <div class="status-bar" id="status-bar">
+                <span class="sdot"></span>
+                <span id="status-text">Select an image to begin.</span>
+            </div>
+            <div class="status-bar" id="video-status-bar" style="display: none">
+                <span class="sdot"></span>
+                <span id="video-status-text"
+                    >Select a video file to begin.</span
+                >
+            </div>
+            <div class="status-bar" id="live-status-bar" style="display: none">
+                <span class="sdot"></span>
+                <span id="live-status-text">Click Start Camera to begin.</span>
+            </div>
+
+            <!-- PHOTO OUTPUT GRID -->
+            <div class="preview-grid" id="photo-grid">
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Uploaded Image</span>
+                        <span class="panel-chip chip-raw">RAW</span>
+                    </div>
+                    <div class="image-frame">
+                        <img id="input-preview" alt="Uploaded image" />
+                        <div class="ph" id="ph-input">
+                            Your selected image<br />will appear here.
+                        </div>
+                    </div>
                 </div>
 
-                <div class="status-bar" id="live-status-bar">
-                    <span class="sdot"></span>
-                    <span id="live-status-text"
-                        >Click Start Camera to begin.</span
+                <div class="panel" id="binary-panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Binary Segmentation</span>
+                        <div
+                            style="display: flex; gap: 8px; align-items: center"
+                        >
+                            <button class="toggle-overlay" id="toggle-binary">
+                                Overlay
+                            </button>
+                            <span class="panel-chip chip-binary"
+                                >FOCAL LOSS</span
+                            >
+                        </div>
+                    </div>
+                    <div class="image-frame">
+                        <img id="binary-preview" alt="Binary segmentation" />
+                        <img
+                            class="overlay-img"
+                            id="binary-overlay"
+                            alt="Original overlay"
+                        />
+                        <div class="spinner" id="spinner"></div>
+                        <div class="ph" id="ph-binary">
+                            Binary lane mask<br />will appear here.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel" id="instance-panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Instance Segmentation</span>
+                        <div
+                            style="display: flex; gap: 8px; align-items: center"
+                        >
+                            <button class="toggle-overlay" id="toggle-instance">
+                                Overlay
+                            </button>
+                            <span class="panel-chip chip-instance"
+                                >DISC. LOSS</span
+                            >
+                        </div>
+                    </div>
+                    <div class="image-frame">
+                        <img
+                            id="instance-preview"
+                            alt="Instance segmentation"
+                        />
+                        <img
+                            class="overlay-img"
+                            id="instance-overlay"
+                            alt="Original overlay"
+                        />
+                        <div class="spinner" id="spinner-instance"></div>
+                        <div class="ph" id="ph-instance">
+                            Instance segmentation<br />will appear here.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIDEO OUTPUT GRID -->
+            <div class="preview-grid" id="video-grid" style="display: none">
+                <div class="panel video-panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Original Video</span>
+                        <span class="panel-chip chip-raw">RAW</span>
+                    </div>
+                    <div
+                        class="image-frame"
+                        style="height: auto; padding: 12px"
+                    >
+                        <video
+                            id="raw-video"
+                            controls
+                            style="
+                                display: none;
+                                width: 100%;
+                                border-radius: 6px;
+                            "
+                        ></video>
+                        <div class="ph" id="ph-raw-video">
+                            Uploaded video<br />will appear here.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel video-panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Binary Video</span>
+                        <span class="panel-chip chip-binary">FOCAL LOSS</span>
+                    </div>
+                    <div
+                        class="image-frame"
+                        style="height: auto; padding: 12px"
+                    >
+                        <video
+                            id="binary-video"
+                            controls
+                            style="
+                                display: none;
+                                width: 100%;
+                                border-radius: 6px;
+                            "
+                        ></video>
+                        <div class="ph" id="ph-binary-video">
+                            Binary output video<br />will appear here.
+                        </div>
+                        <div class="spinner" id="video-spinner-binary"></div>
+                    </div>
+                    <a
+                        id="binary-video-download"
+                        class="btn-download"
+                        style="display: none; margin: 8px 0 0 0"
+                        download="binary_lanes.mp4"
+                        >Download Binary</a
                     >
                 </div>
 
-                <div class="preview-grid" id="live-grid">
-                    <div class="panel">
-                        <div class="panel-head">
-                            <span class="panel-title">Live Camera Feed</span>
-                            <span class="panel-chip chip-raw">RAW</span>
-                        </div>
-                        <div
-                            class="image-frame"
-                            style="height: auto; padding: 8px"
-                        >
-                            <video
-                                id="live-video"
-                                autoplay
-                                muted
-                                playsinline
-                                class="live-video-frame"
-                                style="display: none"
-                            ></video>
-                            <div class="ph" id="ph-live-feed">
-                                Camera feed<br />will appear here.
-                            </div>
-                        </div>
+                <div class="panel video-panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Instance Video</span>
+                        <span class="panel-chip chip-instance">DISC. LOSS</span>
                     </div>
-
-                    <div class="panel">
-                        <div class="panel-head">
-                            <span class="panel-title">Binary Segmentation</span>
-                            <span class="panel-chip chip-binary">LIVE</span>
+                    <div
+                        class="image-frame"
+                        style="height: auto; padding: 12px"
+                    >
+                        <video
+                            id="instance-video"
+                            controls
+                            style="
+                                display: none;
+                                width: 100%;
+                                border-radius: 6px;
+                            "
+                        ></video>
+                        <div class="ph" id="ph-instance-video">
+                            Instance output video<br />will appear here.
                         </div>
-                        <div class="image-frame">
-                            <img id="live-binary" alt="Live binary" />
-                            <div class="ph" id="ph-live-binary">
-                                Live binary output<br />will appear here.
-                            </div>
-                        </div>
+                        <div class="spinner" id="video-spinner-instance"></div>
                     </div>
+                    <a
+                        id="instance-video-download"
+                        class="btn-download"
+                        style="display: none; margin: 8px 0 0 0"
+                        download="instance_lanes.mp4"
+                        >Download Instance</a
+                    >
+                </div>
+            </div>
 
-                    <div class="panel">
-                        <div class="panel-head">
-                            <span class="panel-title"
-                                >Instance Segmentation</span
-                            >
-                            <span class="panel-chip chip-instance">LIVE</span>
-                        </div>
-                        <div class="image-frame">
-                            <img id="live-instance" alt="Live instance" />
-                            <div class="ph" id="ph-live-instance">
-                                Live instance output<br />will appear here.
-                            </div>
+            <!-- LIVE OUTPUT GRID -->
+            <div class="preview-grid" id="live-grid" style="display: none">
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Live Camera Feed</span>
+                        <span class="panel-chip chip-raw">RAW</span>
+                    </div>
+                    <div class="image-frame" style="height: auto; padding: 8px">
+                        <video
+                            id="live-video"
+                            autoplay
+                            muted
+                            playsinline
+                            class="live-video-frame"
+                            style="display: none"
+                        ></video>
+                        <div class="ph" id="ph-live-feed">
+                            Camera feed<br />will appear here.
                         </div>
                     </div>
                 </div>
 
-                <canvas
-                    id="capture-canvas"
-                    width="320"
-                    height="180"
-                    style="display: none"
-                ></canvas>
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Binary Segmentation</span>
+                        <span class="panel-chip chip-binary">LIVE</span>
+                    </div>
+                    <div class="image-frame">
+                        <img id="live-binary" alt="Live binary" />
+                        <div class="ph" id="ph-live-binary">
+                            Live binary output<br />will appear here.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-head">
+                        <span class="panel-title">Instance Segmentation</span>
+                        <span class="panel-chip chip-instance">LIVE</span>
+                    </div>
+                    <div class="image-frame">
+                        <img id="live-instance" alt="Live instance" />
+                        <div class="ph" id="ph-live-instance">
+                            Live instance output<br />will appear here.
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <canvas
+                id="capture-canvas"
+                width="320"
+                height="180"
+                style="display: none"
+            ></canvas>
         </main>
 
         <!-- THEORY PANEL -->
@@ -1624,7 +1553,7 @@
                         </div>
                         <p class="tc-p">
                             Efficiency is at the core of
-                            <strong>a see lane</strong>. We utilize a shared
+                            <strong>see lane</strong>. We utilize a shared
                             encoder that extracts high-dimensional features
                             once, feeding into independent decoder branches for
                             semantic and instance tasks. This architectural
@@ -1676,7 +1605,6 @@
                             reflecting the primacy of detecting lane pixels
                             before differentiating them from one another.
                         </p>
-
                         <div class="formula-block">
                             <div class="formula-name">
                                 Focal Loss — Binary Segmentation
@@ -1690,10 +1618,10 @@
                                 correctly-classified background pixels so the
                                 model focuses its learning capacity on the rare
                                 and difficult lane pixels. Weight in combined
-                                loss: <strong>10x</strong>.
+                                loss:
+                                <strong>10x</strong>.
                             </div>
                         </div>
-
                         <div class="formula-block red">
                             <div class="formula-name">
                                 Discriminative Loss — Instance Segmentation
@@ -1712,13 +1640,11 @@
                                 <strong>0.3 x L_var + 1.0 x L_dist</strong>.
                             </div>
                         </div>
-
                         <p class="tc-p">
                             <strong>Total Loss</strong> = 10 x FocalLoss + 0.3 x
                             L_var + 1.0 x L_dist
                         </p>
                         <div class="divider"></div>
-
                         <p class="tc-p">
                             <strong>Dataset — TuSimple Benchmark.</strong> Each
                             training sample contains an RGB image, a binary
@@ -1728,7 +1654,6 @@
                             <code>tusimple_transform.py</code> which supports
                             training-only, train+val, or train+val+test splits.
                         </p>
-
                         <p class="tc-p">
                             <strong>Data Augmentation (training only):</strong>
                             Resize to 256x512 → ColorJitter (brightness,
@@ -1738,7 +1663,6 @@
                             resized with INTER_NEAREST to preserve discrete
                             integer values.
                         </p>
-
                         <p class="tc-p">
                             <strong>Optimiser:</strong> Adam or SGD with
                             step/exponential learning rate scheduling. Default:
@@ -2032,17 +1956,39 @@
 
             // ── MODE SELECTOR ──────────────────────────────────────────────
             const modeButtons = document.querySelectorAll(".btn-mode");
-            const photoControls = document.getElementById("photo-controls");
-            const videoControls = document.getElementById("video-controls");
-            const liveControls = document.getElementById("live-controls");
 
             function switchMode(mode) {
                 modeButtons.forEach((b) =>
                     b.classList.toggle("active", b.dataset.mode === mode),
                 );
-                photoControls.style.display = mode === "photo" ? "" : "none";
-                videoControls.style.display = mode === "video" ? "" : "none";
-                liveControls.style.display = mode === "live" ? "" : "none";
+                document.getElementById("photo-trigger").style.display =
+                    mode === "photo" ? "" : "none";
+                document.getElementById("video-trigger").style.display =
+                    mode === "video" ? "" : "none";
+                document.getElementById("live-trigger").style.display =
+                    mode === "live" ? "" : "none";
+                document.getElementById("photo-action").style.display =
+                    mode === "photo" ? "" : "none";
+                document.getElementById("video-action").style.display =
+                    mode === "video" ? "" : "none";
+                document.getElementById("live-action").style.display =
+                    mode === "live" ? "" : "none";
+                document.getElementById("filename").style.display =
+                    mode === "photo" ? "" : "none";
+                document.getElementById("video-filename").style.display =
+                    mode === "video" ? "" : "none";
+                document.getElementById("status-bar").style.display =
+                    mode === "photo" ? "" : "none";
+                document.getElementById("video-status-bar").style.display =
+                    mode === "video" ? "" : "none";
+                document.getElementById("live-status-bar").style.display =
+                    mode === "live" ? "" : "none";
+                document.getElementById("photo-grid").style.display =
+                    mode === "photo" ? "" : "none";
+                document.getElementById("video-grid").style.display =
+                    mode === "video" ? "" : "none";
+                document.getElementById("live-grid").style.display =
+                    mode === "live" ? "" : "none";
                 if (mode !== "live") stopLiveCamera();
             }
 
@@ -2225,7 +2171,6 @@
                     instanceVideoObjectUrl = null;
                 }
             }
-
             function setVideoStatus(msg, state = "") {
                 videoStatusText.textContent = msg;
                 videoStatusBar.className =
@@ -2238,13 +2183,11 @@
                 videoFilenameEl.textContent = file.name;
                 videoRunButton.disabled = false;
                 setVideoStatus("Video ready — click Process Video.");
-                // Show raw video preview immediately from the local file
                 if (rawVideoUrl) URL.revokeObjectURL(rawVideoUrl);
                 rawVideoUrl = URL.createObjectURL(file);
                 rawVideoEl.src = rawVideoUrl;
                 rawVideoEl.style.display = "block";
                 phRawVideo.style.display = "none";
-                // Reset output panels for a fresh run
                 revokeOutputVideoUrls();
                 binaryVideoEl.style.display = "none";
                 binaryVideoEl.src = "";
@@ -2449,7 +2392,6 @@
                             phLiveInstance.style.display = "none";
                             liveBinaryImg.classList.add("visible");
                             liveInstanceImg.classList.add("visible");
-                            // FPS calculation
                             fpsFrameCount++;
                             const now = performance.now();
                             const elapsed = (now - fpsLastTime) / 1000;
@@ -2500,6 +2442,7 @@
                     "car",
                     "car",
                     "car",
+                    "car",
                     "truck",
                     "truck",
                     "bike",
@@ -2514,11 +2457,11 @@
                         speed: 0.0003 + Math.random() * 0.0007,
                         type: TYPES[Math.floor(Math.random() * TYPES.length)],
                         color: [
-                            "#C41028",
-                            "#1A1A1A",
-                            "#5A5245",
-                            "#8A7652",
-                            "#333",
+                            "#C8B48A",
+                            "#B09C72",
+                            "#A08C68",
+                            "#C4AE84",
+                            "#B09878",
                         ][Math.floor(Math.random() * 5)],
                     });
                 }
@@ -2565,7 +2508,7 @@
                         if (t === 0) ctx.moveTo(p.x + sway, p.y);
                         else ctx.lineTo(p.x + sway, p.y);
                     }
-                    ctx.strokeStyle = "rgba(26,26,26,0.5)";
+                    ctx.strokeStyle = "rgba(90, 70, 40, 0.45)";
                     ctx.lineWidth = 2;
                     ctx.setLineDash([20, 30]);
                     ctx.lineDashOffset = -time * 0.05;
@@ -2580,14 +2523,16 @@
                         Math.sin(v.t * 4 + time * 0.0005 + lane.offset) * 15;
                     const x = p.x + sway,
                         y = p.y;
+
                     ctx.fillStyle = v.color;
+
                     if (v.type === "car") {
                         ctx.beginPath();
                         ctx.roundRect(x - 7, y - 12, 14, 24, 4);
                         ctx.fill();
-                        ctx.fillStyle = "rgba(200,191,168,0.5)";
+                        ctx.fillStyle = "rgba(165,148,115,0.5)";
                         ctx.fillRect(x - 4, y - 7, 8, 5);
-                        ctx.fillStyle = "#111";
+                        ctx.fillStyle = "rgba(60,45,25,0.7)";
                         ctx.fillRect(x - 8, y - 9, 2, 5);
                         ctx.fillRect(x + 6, y - 9, 2, 5);
                         ctx.fillRect(x - 8, y + 4, 2, 5);
@@ -2596,14 +2541,13 @@
                         ctx.beginPath();
                         ctx.roundRect(x - 9, y - 8, 18, 12, 3);
                         ctx.fill();
-                        ctx.fillStyle =
-                            v.color === "#C41028" ? "#8a0c1e" : "#333";
+                        ctx.fillStyle = "rgba(90,72,50,0.8)";
                         ctx.beginPath();
                         ctx.roundRect(x - 10, y + 4, 20, 22, 2);
                         ctx.fill();
-                        ctx.fillStyle = "rgba(200,191,168,0.5)";
+                        ctx.fillStyle = "rgba(165,148,115,0.5)";
                         ctx.fillRect(x - 6, y - 5, 12, 5);
-                        ctx.fillStyle = "#111";
+                        ctx.fillStyle = "rgba(60,45,25,0.7)";
                         ctx.fillRect(x - 11, y - 4, 2, 5);
                         ctx.fillRect(x + 9, y - 4, 2, 5);
                         ctx.fillRect(x - 11, y + 10, 2, 5);
@@ -2617,7 +2561,7 @@
                         ctx.beginPath();
                         ctx.arc(x, y - 12, 3, 0, Math.PI * 2);
                         ctx.fill();
-                        ctx.fillStyle = "#111";
+                        ctx.fillStyle = "rgba(60,45,25,0.7)";
                         ctx.beginPath();
                         ctx.arc(x, y - 14, 2, 0, Math.PI * 2);
                         ctx.fill();
@@ -2625,6 +2569,7 @@
                         ctx.arc(x, y + 10, 2, 0, Math.PI * 2);
                         ctx.fill();
                     }
+
                     const glowR =
                         v.type === "truck" ? 20 : v.type === "bike" ? 10 : 15;
                     const grad = ctx.createRadialGradient(
@@ -2635,12 +2580,7 @@
                         y - 12,
                         glowR,
                     );
-                    grad.addColorStop(
-                        0,
-                        v.color === "#C41028"
-                            ? "rgba(196,16,40,0.2)"
-                            : "rgba(26,26,26,0.1)",
-                    );
+                    grad.addColorStop(0, "rgba(160,130,80,0.15)");
                     grad.addColorStop(1, "transparent");
                     ctx.fillStyle = grad;
                     ctx.beginPath();
