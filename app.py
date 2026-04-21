@@ -16,6 +16,7 @@ except Exception:
 import cv2
 import numpy as np
 from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 import infer
@@ -25,6 +26,7 @@ VIDEO_OUTPUT_DIR = BASE_DIR / "video_output"
 INFERENCE_LOCK = threading.Lock()
 
 app = Flask(__name__, static_folder=str(BASE_DIR), static_url_path="")
+CORS(app)
 
 # Load model once at startup
 infer.get_model()
@@ -33,6 +35,11 @@ infer.get_model()
 @app.get("/")
 def index():
     return app.send_static_file("index.html")
+
+
+@app.get("/index1")
+def index1():
+    return app.send_static_file("index1.html")
 
 
 @app.get("/output/<path:filename>")

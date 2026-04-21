@@ -29,6 +29,12 @@
                 --radius-lg: 40px;
 
                 --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+                --bg-grayscale: 0%;
+                --logo-lane-color: var(--dm-black);
+                --lane-font: var(--font-brand);
+                --lane-letter-spacing: -0.04em;
+                --lane-weight: 400;
             }
 
             *,
@@ -43,11 +49,7 @@
             }
 
             body {
-                background: var(--dm-bone);
-                background-image: url("images/parchment_bg.png");
-                background-size: cover;
-                background-attachment: fixed;
-                background-position: center;
+                background: #050505;
                 color: var(--dm-black);
                 font-family: var(--font-body);
                 min-height: 100vh;
@@ -55,12 +57,28 @@
                 line-height: 1.5;
             }
 
+            /* Background texture and color (Isolated pulse) */
+            body::after {
+                content: "";
+                position: fixed;
+                inset: 0;
+                z-index: -2;
+                background: var(--dm-bone);
+                background-image: url("images/parchment_bg.png");
+                background-size: cover;
+                background-attachment: fixed;
+                background-position: center;
+                filter: grayscale(var(--bg-grayscale)) contrast(calc(1 + 0.15 * var(--bg-grayscale-raw, 0)));
+                opacity: var(--bg-texture-opacity, 1);
+                pointer-events: none;
+            }
+
             /* Vignette overlay to match logo aesthetic */
             body::before {
                 content: "";
                 position: fixed;
                 inset: 0;
-                z-index: 0;
+                z-index: -1;
                 background: radial-gradient(
                     ellipse at center,
                     transparent 40%,
@@ -139,8 +157,8 @@
                 inset: 0;
                 z-index: 0;
                 pointer-events: none;
-                opacity: 0.3;
-                mix-blend-mode: multiply;
+                opacity: var(--canvas-opacity, 0.3);
+                mix-blend-mode: screen;
             }
 
             .nav-left {
@@ -229,7 +247,9 @@
 
             h1 span {
                 display: inline;
-                color: var(--dm-black);
+                color: var(--logo-lane-color, var(--dm-black));
+                font-family: var(--font-brand);
+                letter-spacing: -0.04em;
             }
 
             .hero-desc {
@@ -1246,7 +1266,7 @@
                             </svg>
                             Choose Image
                         </label>
-                        <button type="submit" class="btn-run" id="run-button">
+                        <button type="button" class="btn-run" id="run-button">
                             <svg
                                 width="13"
                                 height="13"
@@ -1896,296 +1916,6 @@ kubectl expose deployment lane-detection \
                                 <div class="cite-meta">Chen, Zhu, Papandreou, Schroff, Adam · ECCV 2018 · arXiv:1802.02611</div>
                             </div>
                         </a>
-                        <div class="divider"></div>
-                        <p class="tc-p"><strong>Tech Stack:</strong> PyTorch 1.2+ · Torchvision · Flask · OpenCV · Pillow · NumPy · Pandas · scikit-image · Base64 · threading.Lock · Docker · TuSimple Dataset</p>
-                    </div>
-                </div>
-
-                    <!-- ARCHITECTURE -->
-                    <div class="tab-pane" id="tab-architecture">
-                        <div class="tc-h2">The Blueprint</div>
-                        <div class="tc-sub">Shared Encoder // Multi-Decoder Branch</div>
-                        <p class="tc-p">
-                            LaneNet uses a shared encoder feeding into two independent decoders. This architectural elegance ensures low latency without compromising on spatial resolution.
-                        </p>
-
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Component</th>
-                                    <th>Details</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Encoder</td>
-                                    <td>Lightweight ENet (or U-Net/DeepLabv3+ for accuracy)</td>
-                                </tr>
-                                <tr>
-                                    <td>Binary Decoder</td>
-                                    <td>Semantic segmentation (lane pixel detection)</td>
-                                </tr>
-                                <tr>
-                                    <td>Instance Decoder</td>
-                                    <td>Instance segmentation (individual lane identification)</td>
-                                </tr>
-                                <tr>
-                                    <td>Loss Functions</td>
-                                    <td>Focal Loss (binary) + Discriminative Loss (instance)</td>
-                                </tr>
-                                <tr>
-                                    <td>Input</td>
-                                    <td>RGB images (3 channels), resized to 512 × 256</td>
-                                </tr>
-                                <tr>
-                                    <td>Output</td>
-                                    <td>Binary mask (2 channels) + Instance map (3 channels RGB)</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <h3>Supported Backbones</h3>
-                        <div class="card-grid">
-                            <div class="tc-card">
-                                <div class="tc-card-title">ENet Engine (Default)</div>
-                                <div class="tc-card-body">
-                                    Optimized for real-time edge deployment. Minimizes parameter count (~3M) while maximizing performance via dilated and asymmetric convolutions.
-                                </div>
-                                <span class="tc-tag">3M Params // 25ms Inference</span>
-                            </div>
-                            <div class="tc-card">
-                                <div class="tc-card-title">U-Net Balanced</div>
-                                <div class="tc-card-body">
-                                    5-level encoder with DoubleConv blocks. Progressive channel expansion and skip connections preserve fine spatial details.
-                                </div>
-                                <span class="tc-tag">30M Params // 45ms Inference</span>
-                            </div>
-                            <div class="tc-card">
-                                <div class="tc-card-title">DeepLabv3+ Premium</div>
-                                <div class="tc-card-body">
-                                    ResNet-101 backbone with ASPP (Atrous Spatial Pyramid Pooling). Captures multi-scale context for maximum accuracy.
-                                </div>
-                                <span class="tc-tag red">50M Params // 80ms Inference</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- TRAINING -->
-                    <div class="tab-pane" id="tab-training">
-                        <div class="tc-h2">Training the Model</div>
-                        <div class="tc-sub">Loss functions, datasets, and optimisation strategy.</div>
-                        <p class="tc-p">
-                            The model is trained end-to-end with a combined multi-task loss that emphasizes binary lane detection. Total Loss = 10 × Binary Loss + (0.3 × Var Loss + 1.0 × Dist Loss).
-                        </p>
-
-                        <div class="formula-block">
-                            <div class="formula-name">Focal Loss — Binary Segmentation</div>
-                            <div class="formula-eq">FL(pt) = -alpha(1-pt)^gamma * log(pt) &nbsp;&nbsp; gamma=2, alpha=[0.25, 0.75]</div>
-                            <div class="formula-desc">
-                                Addresses severe class imbalance (<5% lane pixels). Down-weights easy, correctly-classified pixels to focus on difficult lane features.
-                            </div>
-                        </div>
-
-                        <div class="formula-block red">
-                            <div class="formula-name">Discriminative Loss — Instance Segmentation</div>
-                            <div class="formula-eq">L_var (variance) + L_dist (distance) + L_reg (reg)</div>
-                            <div class="formula-desc">
-                                <strong>L_var</strong> pulls pixels of the same lane close to their mean embedding. <strong>L_dist</strong> pushes different lane mean embeddings apart.
-                            </div>
-                        </div>
-
-                        <h3>Dataset Preparation</h3>
-                        <p class="tc-p">
-                            <strong>TuSimple Dataset:</strong> RGB images resized from 1280×720 to 512×256. 
-                            <strong>Augmentation:</strong> ColorJitter (brightness, contrast, saturation, hue each ±0.1) for training stability.
-                        </p>
-                        
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Parameter</th>
-                                    <th>Value</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Batch Size</td>
-                                    <td>Default 32</td>
-                                </tr>
-                                <tr>
-                                    <td>Optimizer</td>
-                                    <td>Adam or SGD</td>
-                                </tr>
-                                <tr>
-                                    <td>Input Size</td>
-                                    <td>512 × 256</td>
-                                </tr>
-                                <tr>
-                                    <td>Device</td>
-                                    <td>GPU (CUDA) or CPU</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- INFERENCE -->
-                    <div class="tab-pane" id="tab-inference">
-                        <div class="tc-h2">Inference Pipeline</div>
-                        <div class="tc-sub">From raw input to JSON-encoded visualization.</div>
-                        <div class="steps">
-                            <div class="step">
-                                <div class="step-num">1</div>
-                                <div>
-                                    <div class="step-title">Preprocessing</div>
-                                    <div class="step-desc">Resize to 512 × 256 and apply ImageNet normalization. Tensor moved to CUDA if available.</div>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">2</div>
-                                <div>
-                                    <div class="step-title">Forward Pass</div>
-                                    <div class="step-desc">Encoder extracts features; Binary decoder outputs logits; Instance decoder outputs embeddings.</div>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">3</div>
-                                <div>
-                                    <div class="step-title">Post-processing</div>
-                                    <div class="step-desc">Binary: argmax + softmax. Instance: sigmoid probability map.</div>
-                                </div>
-                            </div>
-                            <div class="step">
-                                <div class="step-num">4</div>
-                                <div>
-                                    <div class="step-title">Encode & Respond</div>
-                                    <div class="step-desc">Results base64-encoded and returned as JSON payload to the Studio interface.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- PERFORMANCE -->
-                    <div class="tab-pane" id="tab-performance">
-                        <div class="tc-h2">Benchmarks & Metrics</div>
-                        <div class="tc-sub">Measured on NVIDIA V100 GPU with 640×480 images.</div>
-                        
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Backbone</th>
-                                    <th>Params</th>
-                                    <th>Inference</th>
-                                    <th>Binary Acc.</th>
-                                    <th>Instance Acc.</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>ENet (default)</strong></td>
-                                    <td>3M</td>
-                                    <td>25ms</td>
-                                    <td>92%</td>
-                                    <td>89%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>U-Net</strong></td>
-                                    <td>30M</td>
-                                    <td>45ms</td>
-                                    <td>95%</td>
-                                    <td>92%</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>DeepLabv3+</strong></td>
-                                    <td>50M</td>
-                                    <td>80ms</td>
-                                    <td>97%</td>
-                                    <td>94%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-
-                        <h3>Evaluation Metrics</h3>
-                        <div class="formula-block">
-                            <div class="formula-name">Dice Coefficient (F1-Score)</div>
-                            <div class="formula-eq">Dice = 2 * |A∩B| / (|A| + |B|)</div>
-                            <div class="formula-desc">Robust to class imbalance. preferred for lane detection where lanes occupy small image regions.</div>
-                        </div>
-                        <div class="formula-block red">
-                            <div class="formula-name">Intersection over Union (IoU)</div>
-                            <div class="formula-eq">IoU = |A∩B| / |A∪B|</div>
-                            <div class="formula-desc">Stricter benchmark metric. Penalises false positives and false negatives equally.</div>
-                        </div>
-                    </div>
-
-                    <!-- DEPLOYMENT -->
-                    <div class="tab-pane" id="tab-deployment">
-                        <div class="tc-h2">Deployment Options</div>
-                        <div class="tc-sub">Scale your implementation from Local to Kubernetes.</div>
-                        
-                        <h3>Option 1: Local Development</h3>
-                        <pre>pip install -r requirements.txt
-python app.py</pre>
-
-                        <h3>Option 2: Docker Delivery</h3>
-                        <pre># Build
-docker build -t lane-detection:latest .
-# Run
-docker run -p 5000:5000 lane-detection:latest</pre>
-
-                        <h3>Option 3: AWS / EC2</h3>
-                        <p class="tc-p">Recommended: g4dn.xlarge for GPU acceleration. Run with Gunicorn for production traffic:</p>
-                        <pre>pip install gunicorn
-gunicorn -w 4 -b 0.0.0.0:5000 app:app</pre>
-
-                        <h3>Option 4: Kubernetes</h3>
-                        <pre>kubectl apply -f k8s/deployment.yaml
-kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-port=5000</pre>
-                    </div>
-
-                    <!-- REFERENCES -->
-                    <div class="tab-pane" id="tab-references">
-                        <div class="tc-h2">References</div>
-                        <div class="tc-sub">The research papers this project builds upon.</div>
-
-                        <a class="cite-link" href="https://arxiv.org/abs/1802.05591" target="_blank">
-                            <span class="cite-num">[1]</span>
-                            <div>
-                                <div class="cite-title">Towards End-to-End Lane Detection: an Instance Segmentation Approach</div>
-                                <div class="cite-meta">Neven, De Brabandere et al. · 2018 IEEE IV · arXiv:1802.05591</div>
-                            </div>
-                        </a>
-
-                        <a class="cite-link" href="https://arxiv.org/abs/1606.02147" target="_blank">
-                            <span class="cite-num">[2]</span>
-                            <div>
-                                <div class="cite-title">ENet: A Deep Neural Network Architecture for Real-Time Semantic Segmentation</div>
-                                <div class="cite-meta">Paszke, Chaurasia et al. · arXiv:1606.02147 · 2016</div>
-                            </div>
-                        </a>
-
-                        <a class="cite-link" href="https://arxiv.org/abs/1708.02551" target="_blank">
-                            <span class="cite-num">[3]</span>
-                            <div>
-                                <div class="cite-title">Semantic Instance Segmentation with a Discriminative Loss Function</div>
-                                <div class="cite-meta">De Brabandere, Neven et al. · arXiv:1708.02551 · 2017</div>
-                            </div>
-                        </a>
-
-                        <a class="cite-link" href="https://arxiv.org/abs/1708.02051" target="_blank">
-                            <span class="cite-num">[4]</span>
-                            <div>
-                                <div class="cite-title">Focal Loss for Dense Object Detection</div>
-                                <div class="cite-meta">Lin, Goyal et al. · ICCV 2017 · arXiv:1708.02051</div>
-                            </div>
-                        </a>
-
-                        <a class="cite-link" href="https://arxiv.org/abs/1802.02611" target="_blank">
-                            <span class="cite-num">[5]</span>
-                            <div>
-                                <div class="cite-title">DeepLabv3+: Encoder-Decoder with Atrous Separable Convolution</div>
-                                <div class="cite-meta">Chen, Zhu et al. · ECCV 2018 · arXiv:1802.02611</div>
-                            </div>
-                        </a>
 
                         <div class="divider"></div>
                         <p class="tc-p">
@@ -2328,8 +2058,7 @@ kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-
                 setStatus("Image ready — click Run Detection.");
             });
 
-            form.addEventListener("submit", async (e) => {
-                e.preventDefault();
+            async function runDetection() {
                 const [file] = fileInput.files;
                 if (!file) {
                     setStatus("Please choose an image first.", "error");
@@ -2396,7 +2125,10 @@ kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-
                     spinnerInstance.classList.remove("visible");
                     runButton.disabled = false;
                 }
-            });
+            }
+
+            runButton.addEventListener("click", runDetection);
+            form.addEventListener("submit", (e) => { e.preventDefault(); runDetection(); });
 
             // ── VIDEO MODE ─────────────────────────────────────────────────
             const videoFileInput = document.getElementById("video-file-input");
@@ -2707,20 +2439,33 @@ kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-
                     "bike",
                     "bike",
                 ];
+                function hexToRgb(hex) {
+                    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                    return result ? {
+                        r: parseInt(result[1], 16),
+                        g: parseInt(result[2], 16),
+                        b: parseInt(result[3], 16)
+                    } : { r: 0, g: 0, b: 0 };
+                }
+
                 const vehicles = [];
                 for (let i = 0; i < 14; i++) {
+                    const colorHex = [
+                        "#C41028",
+                        "#1A1A1A",
+                        "#5A5245",
+                        "#8A7652",
+                        "#333",
+                    ][Math.floor(Math.random() * 5)];
+                    const rgb = hexToRgb(colorHex);
                     vehicles.push({
                         lane: Math.floor(Math.random() * lanes.length),
                         t: Math.random(),
                         speed: 0.0003 + Math.random() * 0.0007,
                         type: TYPES[Math.floor(Math.random() * TYPES.length)],
-                        color: [
-                            "#C41028",
-                            "#1A1A1A",
-                            "#5A5245",
-                            "#8A7652",
-                            "#333",
-                        ][Math.floor(Math.random() * 5)],
+                        color: rgb,
+                        gray: 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b,
+                        isRed: colorHex === "#C41028"
                     });
                 }
 
@@ -2757,38 +2502,59 @@ kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-
                     );
                 }
 
-                function drawLane(lane, time) {
+                function smoothStep(x) {
+                    return x * x * (3 - 2 * x);
+                }
+
+                function lerp(a, b, t) { return a + (b - a) * t; }
+
+                function drawLane(lane, time, k) {
+                    // k goes 0 (color/parchment) → 1 (black/schematic)
+                    const c = Math.floor(k * 255);
+                    const alpha = lerp(0.45, 0.95, k);
+                    const dashOn  = lerp(18, 48, k);
+                    const dashOff = lerp(28, 14, k);
+                    const lw = lerp(3, 17, k);
+
                     ctx.beginPath();
                     for (let t = 0; t <= 1; t += 0.005) {
                         const p = getPointOnLane(lane, t);
-                        const sway =
-                            Math.sin(t * 4 + time * 0.0005 + lane.offset) * 15;
+                        const sway = Math.sin(t * 4 + time * 0.0002 + lane.offset) * 15;
                         if (t === 0) ctx.moveTo(p.x + sway, p.y);
                         else ctx.lineTo(p.x + sway, p.y);
                     }
-                    ctx.strokeStyle = "rgba(26,26,26,0.5)";
-                    ctx.lineWidth = 2;
-                    ctx.setLineDash([20, 30]);
-                    ctx.lineDashOffset = -time * 0.05;
+                    ctx.strokeStyle = `rgba(${c},${c},${c},${alpha})`;
+                    ctx.lineWidth = lw;
+                    ctx.setLineDash([dashOn, dashOff]);
+                    ctx.lineDashOffset = -time * 0.02;
                     ctx.stroke();
                     ctx.setLineDash([]);
                 }
 
-                function drawVehicle(v, time) {
+                function drawVehicle(v, time, k) {
+                    const r = Math.floor(lerp(v.color.r, 255, k));
+                    const g = Math.floor(lerp(v.color.g, 255, k));
+                    const b = Math.floor(lerp(v.color.b, 255, k));
+                    const dynamicColor = `rgb(${r},${g},${b})`;
+
+                    const d = Math.floor(lerp(17, 237, k));
+                    const darkColor = `rgb(${d},${d},${d})`;
+                    const winAlpha = lerp(0.38, 0, k);
+                    const windowColor = `rgba(200,191,168,${winAlpha})`;
+
                     const lane = lanes[v.lane];
                     const p = getPointOnLane(lane, v.t);
-                    const sway =
-                        Math.sin(v.t * 4 + time * 0.0005 + lane.offset) * 15;
-                    const x = p.x + sway,
-                        y = p.y;
-                    ctx.fillStyle = v.color;
+                    const sway = Math.sin(v.t * 4 + time * 0.0002 + lane.offset) * 15;
+                    const x = p.x + sway, y = p.y;
+
+                    ctx.fillStyle = dynamicColor;
                     if (v.type === "car") {
                         ctx.beginPath();
                         ctx.roundRect(x - 7, y - 12, 14, 24, 4);
                         ctx.fill();
-                        ctx.fillStyle = "rgba(200,191,168,0.5)";
+                        ctx.fillStyle = windowColor;
                         ctx.fillRect(x - 4, y - 7, 8, 5);
-                        ctx.fillStyle = "#111";
+                        ctx.fillStyle = darkColor;
                         ctx.fillRect(x - 8, y - 9, 2, 5);
                         ctx.fillRect(x + 6, y - 9, 2, 5);
                         ctx.fillRect(x - 8, y + 4, 2, 5);
@@ -2797,14 +2563,13 @@ kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-
                         ctx.beginPath();
                         ctx.roundRect(x - 9, y - 8, 18, 12, 3);
                         ctx.fill();
-                        ctx.fillStyle =
-                            v.color === "#C41028" ? "#8a0c1e" : "#333";
+                        ctx.fillStyle = v.isRed ? `rgb(${Math.floor(lerp(r*0.7,r,k))},${Math.floor(lerp(g*0.7,g,k))},${Math.floor(lerp(b*0.7,b,k))})` : darkColor;
                         ctx.beginPath();
                         ctx.roundRect(x - 10, y + 4, 20, 22, 2);
                         ctx.fill();
-                        ctx.fillStyle = "rgba(200,191,168,0.5)";
+                        ctx.fillStyle = windowColor;
                         ctx.fillRect(x - 6, y - 5, 12, 5);
-                        ctx.fillStyle = "#111";
+                        ctx.fillStyle = darkColor;
                         ctx.fillRect(x - 11, y - 4, 2, 5);
                         ctx.fillRect(x + 9, y - 4, 2, 5);
                         ctx.fillRect(x - 11, y + 10, 2, 5);
@@ -2818,7 +2583,7 @@ kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-
                         ctx.beginPath();
                         ctx.arc(x, y - 12, 3, 0, Math.PI * 2);
                         ctx.fill();
-                        ctx.fillStyle = "#111";
+                        ctx.fillStyle = darkColor;
                         ctx.beginPath();
                         ctx.arc(x, y - 14, 2, 0, Math.PI * 2);
                         ctx.fill();
@@ -2826,22 +2591,9 @@ kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-
                         ctx.arc(x, y + 10, 2, 0, Math.PI * 2);
                         ctx.fill();
                     }
-                    const glowR =
-                        v.type === "truck" ? 20 : v.type === "bike" ? 10 : 15;
-                    const grad = ctx.createRadialGradient(
-                        x,
-                        y - 12,
-                        0,
-                        x,
-                        y - 12,
-                        glowR,
-                    );
-                    grad.addColorStop(
-                        0,
-                        v.color === "#C41028"
-                            ? "rgba(196,16,40,0.2)"
-                            : "rgba(26,26,26,0.1)",
-                    );
+                    const glowR = v.type === "truck" ? 20 : v.type === "bike" ? 10 : 15;
+                    const grad = ctx.createRadialGradient(x, y - 12, 0, x, y - 12, glowR);
+                    grad.addColorStop(0, `rgba(${r},${g},${b},${lerp(0.15, 0.08, k)})`);
                     grad.addColorStop(1, "transparent");
                     ctx.fillStyle = grad;
                     ctx.beginPath();
@@ -2850,18 +2602,32 @@ kubectl expose deployment lane-detection --type=LoadBalancer --port=80 --target-
                 }
 
                 function animate(time) {
+                    // raw sine 0→1
+                    const raw = (Math.sin(time * 0.0004) + 1) / 2;
+                    // double-smoothstep for extra-buttery easing
+                    const k = smoothStep(smoothStep(raw));
+
+                    // --- CSS variables (no thresholds, pure lerp) ---
+                    document.documentElement.style.setProperty('--bg-grayscale', (k * 100) + '%');
+                    document.documentElement.style.setProperty('--bg-grayscale-raw', k);
+                    document.documentElement.style.setProperty('--bg-texture-opacity', 1 - k);
+                    document.documentElement.style.setProperty('--canvas-opacity', lerp(0.28, 0.92, k));
+
+                    // Logo color: ink-black (#1a) → white (#ff)
+                    const lc = Math.floor(lerp(26, 255, k));
+                    document.documentElement.style.setProperty('--logo-lane-color', `rgb(${lc},${lc},${lc})`);
+
                     ctx.clearRect(0, 0, W, H);
-                    lanes.forEach((l) => drawLane(l, time));
+                    lanes.forEach((l) => drawLane(l, time, k));
                     vehicles.forEach((v) => {
                         v.t += v.speed;
                         if (v.t > 1) {
                             v.t = 0;
                             v.lane = Math.floor(Math.random() * lanes.length);
                             v.speed = 0.0003 + Math.random() * 0.0007;
-                            v.type =
-                                TYPES[Math.floor(Math.random() * TYPES.length)];
+                            v.type = TYPES[Math.floor(Math.random() * TYPES.length)];
                         }
-                        drawVehicle(v, time);
+                        drawVehicle(v, time, k);
                     });
                     requestAnimationFrame(animate);
                 }
