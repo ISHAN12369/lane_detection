@@ -12,5 +12,6 @@ COPY . .
 RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 RUN pip install flask numpy opencv-python pillow scikit-image
 
+ENV PORT=7860
 EXPOSE 7860
 CMD ["python", "app.py"]
